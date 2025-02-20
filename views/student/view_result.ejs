@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>View result</title>
+   <style>
+   .bioTable{
+        width: 100%;
+        border: 1px solid;
+        padding: 5px;
+   }
+   .bioTable td{
+      font-size: 16px;
+      font-family: cambria;
+   }
+    .resultTable{
+      width: 100%;
+    }
+   .resultTable, .resultTable th, .resultTable td{
+      border: 1px solid;
+      padding: 7px;
+      text-align: center;
+   }
+   .resultTable td{
+      font-size: 13.5px;
+   }
+   .heading{
+      width: 100%;
+   }
+   .heading, .heading th, .heading td{
+      border: 1px solid;
+      padding: 5px;
+   }
+   .sub-heading{
+      width: 100%;
+   }
+   .sub-heading, .sub-heading th, .sub-heading td{
+      border: 1px solid;
+      padding: 2px;
+      text-align: center;
+   }
+   </style>
+</head>
+<body>
+   <div>
+      <table class="heading">
+         <tr>
+            <td><center><img src="/fcahptib.png" height="50" alt=""/></center>
+            <h2 style="font-size: 16pt;">FEDERAL COLLEGE OF ANIMAL HEALTH AND PRODUCTION TECHNOLOGY, IBADAN.</h2></td>
+         </tr>
+      </table>
+      <table class="sub-heading">
+         <tr>
+      <td><h3>Student's Result</h3></td>
+      </tr>
+      </table>
+   <table class="bioTable">
+      <tr>
+          <td><b>Student Name:</b></td><td style="font-family: monospace;"><%=fullname%></td>
+      </tr>
+      <tr>
+          <td><b>Matriculation Number:</b></td><td style="font-family: monospace;"><%=matric %></td>
+      </tr>
+      <tr>
+          <td><b>Course of Study:</b></td><td style="font-family: monospace;"><%=department %></td>
+      </tr>
+      <tr>
+          <td><b>Level:</b></td><td style="font-family: monospace;"><%=level %></td>
+      </tr>
+      <tr>
+         <td><b>Session:</b></td><td style="font-family: monospace;"><%=session %>/<%=session + 1%></td>
+     </tr>
+
+  <!-- <tr>
+   <td><b>Email:</b></td><td style="font-family: monospace;"></td>
+</tr> -->
+  </table>
+
+  <table class="resultTable">
+   <tr>
+   <th>S/N</th>
+   <th>Course Code</th>
+   <th>Course Title</th>
+   <th>Semester</th>
+   <th>Score</th>
+   <th>CU</th>
+   <th>CP</th>
+   <th>GP</th>
+   <th>Remark</th>
+   </tr>
+   <%for(let i = 1; i <= result.length; i++){%>
+   <%result.forEach(res => {%>
+   <tr>
+      <td><%=i++%></td>
+      <td><%=res.CourseId%></td>
+      <td><%=res.CourseTitle%></td>
+      <td><%=res.Semester%></td>
+      <td><%=res.Score%></td>
+      <td><%=res.CourseUnit%></td>
+      <td><%=res.CP%></td>
+      <td><%=res.GP%></td>
+      <%if(res.GP != 0){%>
+         <td>Pass</td>
+      <%}else{%>
+         <td>Repeat</td>
+      <%}%>
+   </tr>
+<%})%>
+<%}%>
+</table>
+   <p><b>TGP:</b> <%=tgp%></p>
+   <p><b>TCU:</b> <%=tcu%></p>
+   <p><b>GPA:</b> <%=gpa%></p>
+   <%if(session==adYear + 1 && reg.length != 1){%>
+   <p><b>CGPA:</b> <%=cgpa.toFixed(2)%></p>
+   <%}else{%>
+   <p><b>CGPA:</b> <%=gpa%></p>
+   <%}%>
+</div>
+<script>
+   window.print()
+</script>
+</body>
+</html>

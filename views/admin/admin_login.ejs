@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="page icon" type="icon" href="/fcahptib.png">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" 
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="/jquery-3.7.1.min.js"></script>
+    <title>Admin Login</title>
+    <style>
+        *{
+            margin: 0;
+            box-sizing: border-box;
+        }
+        body{
+            background-color: gainsboro;
+        }
+        .form{
+            margin: auto;
+            height: fit-content;
+            width: fit-content;
+            margin-top: 5%;
+            background: #fff;
+            padding: 1%;
+            border-top: 3px solid rgb(167, 50, 50);
+            /* border-bottom: 3px solid rgb(167, 50, 50); */
+        }
+        label{
+            font-size: 17px;
+            font-family: calibri;
+        }
+        input{
+            outline: none;
+            border: none;
+            border: 1px solid black;
+            border-radius: 1px;
+            width: 200px;
+            padding: 3%;
+        }
+        button{
+            width: 100%;
+            font-size: 20px;
+            font-family: calibri;
+            outline: none;
+            border: none;
+            padding: 3%;
+            cursor: pointer;
+            background-color: rgb(167, 50, 50);
+            border: transparent;
+            border-radius: 5px;
+            color: #fff;
+        }
+        h3{
+            font-size: 22px;
+            font-family: 'Times New Roman', Times, serif;
+            font-weight: 400;
+            text-align: center;
+            border-bottom: 1pt solid gainsboro;
+        }
+        .footer{
+            display: flex;
+            justify-content: center;
+            padding: 2%;
+}
+    </style>
+</head>
+<body>
+    <div class="form">
+        <center><img src="fcahptib.png" alt="" height="50"></center>
+        <h3>Login as an Admin </h3><br><br>
+        <form action="/admin" method="post">
+            <div id="error" style="<%=style%>"><%=message%></div>
+            <label for="">Admin ID:</label><br>
+            <div class="studentID" style="border: 1px solid black;">
+                <i class="fa fa-fw fa-user" style="font-size: 23px; color: #00000091;"></i>
+                <input type="text" name="username" style="border: none;" required />
+            </div><br>
+
+            <label for="">Password:</label><br>
+            <div class="studentID" style="border: 1px solid black;">
+                <i class="fa fa-fw fa-lock" style="font-size: 23px;color:#00000091;"></i>
+                <input type="password" name="password" id="pass" style="border: none;" required />
+            </div><br>
+            <button type="submit" onclick="validateForm()">Login</button>
+        </form>
+    </div>
+    <div class="footer">
+        <footer>
+           <span style="font-size: 16px; text-align: center;
+           font-style: normal; font-family: sans-serif; color: gray;">&copy; <span id="cr"></span> FCAHPTIB.</span>
+        </footer>
+        </div>
+    <script>
+         let date = new Date
+         document.getElementById("cr").innerHTML = date.getFullYear();
+        function validateForm(){
+        var matric = document.querySelector("#Matric")
+        var password = document.querySelector("#Pass")
+        if(matric.value == ""){
+            matric.style.border = "1px solid red"
+        }else if(password.value == ""){
+            password.style.border = "1px solid red"
+        }else{
+            return;
+        }
+    }
+    const errorMessage = document.getElementById('error')
+    if(errorMessage.innerHTML !== ''){
+        setTimeout(function(){
+            errorMessage.style.display = 'none'
+        },3000)
+    }
+    </script>
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Result</title>
+    <link rel="page icon" type="icon" href="/fcahptib.png">
+    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" 
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="/jquery-3.7.1.min.js"></script>
+    <script src="/index.js"></script>
+<style>
+    table{
+        width: 100%;
+        border-collapse: collapse;
+    }
+    td{
+        text-align: center;
+        font-family: calibri;
+        font-size: 14px;
+    }
+    td button a{
+        font-size: 12px;
+    }
+    th, td{
+        border-bottom: 1px solid gainsboro
+    }
+    .resultbtn{
+        border: none;
+        cursor: pointer;
+        background-color: rgb(37, 164, 248);
+        padding: 8px;
+        font-size: 14px;
+        font-family: calibri;
+        border-radius: 2px;
+    }
+</style>
+</head>
+<body>
+
+    <!-- header -->
+    <div class="header">
+        <img src="fcahptib.png" alt="" height="50">
+        <a href="javascript:void(0);" class="icon" onclick="myFunction()">
+            <i class="fa fa-bars" style="font-size: 20px; color: #fff;
+             align-self: center;"></i>
+          </a>    
+    </div>
+    <div class="sidebar" id="sideBar" style="width: 180px;">
+        <p style="font-family: calibri; font-size: 16px; text-align: center;">
+            <i class="fa fa-fw fa-location"></i><%=fullname%></p><br>
+            <p style="font-family: calibri; font-size: 16px; text-align: center;
+        color: rgb(71, 71, 71); display: block;">
+        <i class="fa fa-fw fa-map-marker" style="font-size: 20px;"></i><%=department%></p><br><br>
+
+            <a href="/dashboard" class="active"><i class="fa fa-fw fa-dashboard"></i>Dashboard</a><br><br><br>
+            <a href="/profile" id="profile"><i class="fa fa-fw fa-user"></i>Profile</a><br><br><br>
+            <a href="/course_registration"><i class="fa fa-fw fa-book"></i>Course Registration</a><br><br><br>
+            <a href="RePrint_Course_Form"><i class="fa fa-fw fa-book"></i>Reprint course form</a><br><br><br>
+            <a href="/result"><i class="fa fa-fw fa-table"></i>My Result</a><br><br><br>
+            <a href="/change_password"><i class="fa fa-fw fa-lock"></i>Change Password</a><br><br><br>
+            <a href="/logout" id="logout"><i class="fa fa-fw fa-sign-out"></i>Logout</a><br><br><br>
+    </div>
+
+    <!-- main content section -->
+    <div class="main-content" id="mainContent">
+       <div class="document">
+        <p style="background-color: rgb(167, 50, 50);;"><%=fullname%> RESULT</p>
+        <table>
+            <tr>
+                <td>Student Name:</td><td><%=fullname%></td>
+            </tr>
+            <tr>
+                <td>Matriculation Number:</td><td><%=matric %></td>
+            </tr>
+            <tr>
+                <td>Course of Study:</td><td><%=department %></td>
+            </tr>
+            <tr>
+                <td>Current Level:</td><td><%=level %></td>
+            </tr>
+        </table>
+       </div>
+    
+       <div class="document">
+        <p>RESULT</p>
+        <table style="height: fit-content; background-color: white;">
+            <tr>
+                <th>Session</th>
+                <th>GPA</th>
+                <th>Action</th>
+            </tr>
+            <%reg.forEach(regs => { %>
+                <tr>
+                    <td><%=regs.Session%>/<%=regs.Session + 1%></td>
+                    <%gp.forEach(res => { %>
+                        <%if(regs.Session == res.Session || reg.includes(res.Session[1]) == true){%>
+                    <td><%=res.mygp.toFixed(2)%></td>
+                    <td><button class="resultbtn">
+                        <a href="/view_result?id=<%=matric%>&session=<%=regs.Session%>&gp=<%=res.mygp.toFixed(2)%>">View/Print</a>
+                    </button></td>
+                        <%}else{%>
+                            <%}%>
+                    <%})%>
+                </tr>
+                <%})%>
+
+                    <tr>
+                        <%if(reg.length == 1){%>
+                        <td style="font-size: 16px; font-weight: bold;">CGPA:</td>
+                        <td><%=gp[0].mygp.toFixed(2)%></td>
+                        <td></td>
+                        <%}else{%>
+                        <td style="font-size: 16px; font-weight: bold;">CGPA:</td>
+                        <td><%=cgpa.toFixed(2)%></td>
+                        <td></td>
+                <%}%>
+            </tr>
+        </table>
+       </div>                           
+
+    <!-- footer section -->
+    <footer>
+        <p style="font-size: 14px; text-align: center;
+        font-style: normal; font-family: sans-serif; color: gray;">
+        &copy; <span id="cr"></span> FCAHPTIB.</p>
+        <p style="font-size: 14px; text-align: center;
+        font-style: normal; font-family: sans-serif; color: gray;">Designed by Adeola Quadri. A</p>
+        <p style="font-size: 14px; text-align: center;
+        font-style: normal; font-family: sans-serif; color: gray;">Supervised Dr. Mrs Olarenwaju O T.</p>
+     </footer>
+    </div>
+        <!-- javascript code section -->
+        <script>
+            document.querySelector('#logout').addEventListener('click', (e)=>{
+   if(confirm('Are sure you want to logout?') == true){
+       fetch('/logout',{
+       method: 'get'})
+   }else{
+       e.preventDefault()
+   }
+   
+})
+let date = new Date()
+document.getElementById('cr').innerHTML = date.getFullYear();
+
+function myFunction() {
+var x = document.getElementById("sideBar");
+if (x.style.display === "block") {
+x.style.display = "none";
+document.getElementById("mainContent").style.marginLeft = "0";
+} else {
+x.style.display = "block";
+document.getElementById("mainContent").style.marginLeft = "180px";
+
+}
+}
+        </script>
+</body>
+</html>

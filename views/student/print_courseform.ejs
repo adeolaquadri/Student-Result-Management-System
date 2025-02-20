@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Course Registration</title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="page icon" type="icon" href="/fcahptib.png">
+    <link rel="stylesheet" 
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="/jquery-3.7.1.min.js"></script>
+    <script src="/index.js"></script>
+<style>
+    .bioTable{
+        width: 100%;
+        border-collapse: collapse;
+    }
+   .bioTable td{
+        text-align: center;
+        font-family: calibri;
+        font-size: 16px;
+    }
+    .bioTable th,.bioTable td{
+        border-bottom: 1px solid gainsboro
+    }
+    .courseTable{
+        width: 100%;
+        border-collapse: collapse;
+        border: 1px solid black;
+    }
+    .courseTable td{
+        text-align: center;
+        font-family: lucida sans;
+        font-weight: 400;
+        font-size: 14px;
+        border: 1px solid black;
+        padding: 5px;
+    }
+    .courseTable th{
+        height: 50px;
+        font-size: 16px;
+        font-family: cambria;
+    }
+   .courseTable th, .courseTable td{
+        border: 1px solid black;
+        background-color: white;
+    }
+    #regBTN{
+        padding: 10px;
+        border: none;
+        width: 120px;
+        background-color: rgb(167, 50, 50);
+        color: white;
+        font-size: 20px;
+        font-family: calibri;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+</style>
+</head>
+<body>
+    <div class="header">
+        <img src="fcahptib.png" alt="" height="50">
+        <a href="javascript:void(0);" class="icon" onclick="myFunction()">
+            <i class="fa fa-bars" style="font-size: 20px; color: #fff;
+             align-self: center;"></i>
+          </a>    
+    </div>
+    <div class="sidebar" id="sideBar" style="width: 180px;">
+       
+
+        <p style="font-family: calibri; font-size: 16px; text-align: center;"><%=fullname%></p><br>
+        
+        <p style="font-family: calibri; font-size: 16px; text-align: center;
+        color: rgb(71, 71, 71); display: block;">
+        <i class="fa fa-fw fa-map-marker" style="font-size: 16px;"></i><%=department%></p><br><br>
+
+            <a href="/dashboard" class="active"><i class="fa fa-fw fa-dashboard"></i>Dashboard</a><br><br><br>
+            <a href="/profile" id="profile"><i class="fa fa-fw fa-user"></i>Profile</a><br><br><br>
+            <a href="/course_registration"><i class="fa fa-fw fa-book"></i>Course Registration</a><br><br><br>
+            <a href="RePrint_Course_Form"><i class="fa fa-fw fa-book"></i>Reprint course form</a><br><br><br>
+            <a href="/result"><i class="fa fa-fw fa-table"></i>My Result</a><br><br><br>
+            <a href="/change_password"><i class="fa fa-fw fa-lock"></i>Change Password</a><br><br><br>
+            <a href="/logout" id="logout"><i class="fa fa-fw fa-sign-out"></i>Logout</a><br><br><br>
+    </div>
+
+    <!-- main content section -->
+    <div class="main-content" id="mainContent">
+        <div class="main">
+            <div class="document">
+                <p style="background-color: rgb(167, 50, 50);;"><%=fullname %> COURSE REGISTRATION</p>
+                <table class="bioTable">
+                    <tr>
+                        <td>Student Name:</td><td><%=fullname %></td>
+                    </tr>
+                    <tr>
+                        <td>Matriculation Number:</td><td><%=matric %></td>
+                    </tr>
+                    <tr>
+                        <td>Course of Study:</td><td><%=department %></td>
+                    </tr>
+                    <tr>
+                        <td>Level:</td><td><%=level %></td>
+                    </tr>
+                    <tr>
+                        <td>Session:</td><td><%=session%>/<%=session2%></td>
+                    </tr>
+                    <tr>
+                        <td>Semester:</td><td style="text-transform: capitalize;"><%=semester %></td>
+                    </tr>
+                </table>
+               </div>
+            <table class="courseTable" id="mycourseTable">
+                <th>Course Code</th>
+                <th>Course Title</th>
+                <th>Course Unit</th>
+                <th>Status</th>
+                <%courses.forEach(course => { %>
+                    <tr>
+                        <td><%=course.COURSE_ID%></td>
+                        <td class="course_title"><%=course.COURSE_TITLE%></td>
+                        <td id="course-unit"><%=course.COURSE_UNIT%></td>
+                        <td id="status"><%=status%></td>
+                    </tr>
+                <% })%>
+                <tr>
+                    <td></td>
+                    <%total_unit.forEach(units_sum => { %>
+                    <td style="text-align: right;">Total Unit:</td><td><%=units_sum.total%></td>
+                    <% })%>
+                </tr>
+         </table>
+            <button type="submit" id="regBTN" onclick="printCourseForm()">Print</button>
+        </div>
+    
+    <!-- footer section -->
+    <footer>
+        <p style="font-size: 14px; text-align: center;
+        font-style: normal; font-family: sans-serif; color: gray;">
+        &copy; <span id="cr"></span> FCAHPTIB.</p>
+        <p style="font-size: 14px; text-align: center;
+        font-style: normal; font-family: sans-serif; color: gray;">Designed by Adeola Quadri. A</p>
+        <p style="font-size: 14px; text-align: center;
+        font-style: normal; font-family: sans-serif; color: gray;">Supervised Dr. Mrs Olarenwaju O T.</p>
+     </footer>
+    </div>
+        <!-- javascript code section -->
+        <script>
+    function printCourseForm(){
+        window.document.write(`
+    <html><head>
+    <title>Course Form</title>
+<style>
+   .bioTable{
+        width: 100%;
+        border: 1px solid;
+        padding: 5px;
+   }
+   .bioTable td{
+      font-size: 16px;
+      font-family: cambria;
+   }
+    .resultTable{
+      width: 100%;
+    }
+   .resultTable, .resultTable th, .resultTable td{
+      border: 1px solid;
+      padding: 7px;
+      text-align: center;
+   }
+   .resultTable td{
+      font-size: 16px;
+   }
+   .heading{
+      width: 100%;
+   }
+   .heading, .heading th, .heading td{
+      border: 1px solid;
+      padding: 5px;
+   }
+   .sub-heading{
+      width: 100%;
+   }
+   .sub-heading, .sub-heading th, .sub-heading td{
+      border: 1px solid;
+      padding: 2px;
+      text-align: center;
+   }
+   </style>
+</head>
+<body>
+   <div>
+      <table class="heading">
+         <tr>
+            <td><h2 style="font-size: 16pt;">FEDERAL COLLEGE OF ANIMAL HEALTH AND PRODUCTION TECHNOLOGY, IBADAN.</h2></td>
+         </tr>
+      </table>
+      <table class="sub-heading">
+         <tr>
+      <td><h3>Student's Course Form</h3></td>
+      </tr>
+      </table>
+   <table class="bioTable">
+      <tr>
+          <td><b>Student Name:</b></td><td style="font-family: monospace;"><%=fullname%></td>
+      </tr>
+      <tr>
+          <td><b>Matriculation Number:</b></td><td style="font-family: monospace;"><%=matric %></td>
+      </tr>
+      <tr>
+          <td><b>Course of Study:</b></td><td style="font-family: monospace;"><%=department %></td>
+      </tr>
+      <tr>
+          <td><b>Level:</b></td><td style="font-family: monospace;"><%=level %></td>
+      </tr>
+      <tr>
+         <td><b>Session:</b></td><td style="font-family: monospace;"><%=session %>/<%=Number(session) + 1%></td>
+     </tr>
+     <tr>
+      <td><b>Semester:</b></td><td style="font-family: monospace;"><%=semester %></td>
+  </tr>
+  </table>
+
+  <table class="resultTable">
+   <tr>
+   <th>S/N</th>
+   <th>Course Code</th>
+   <th>Course Title</th>
+   <th>Course Unit</th>
+   <th>Status</th>
+   </tr>
+   <%for(let i = 1; i < courses.length; i++){%>
+   <%courses.forEach(res => {%>
+   <tr>
+      <td><%=i++%></td>
+      <td><%=res.COURSE_ID%></td>
+      <td><%=res.COURSE_TITLE%></td>
+      <td><%=res.COURSE_UNIT%></td>
+      <td>Registered</td>
+   </tr>
+   <%})%>
+   <%}%>
+   <tr>
+    <%total_unit.forEach(tu => {%>
+    <td></td>
+    <td></td>
+    <td style="text-align: right;"><b>Total Unit:</b></td>
+    <td><%=tu.total%></td>
+    <td></td>
+    <%})%>
+    </tr>
+</table>
+<div style="display:flex; gap: 70px; margin-top:20px;">
+<p>____________________<br>HOD's Signature & Date</p>
+<p>____________________<br>Student's Signature & Date</p>
+</div>
+</div>`);
+        window.print();
+    }
+    document.querySelector('#logout').addEventListener('click', (e)=>{
+   if(confirm('Are sure you want to logout?') == true){
+       fetch('/logout',{
+       method: 'get'})
+   }else{
+       e.preventDefault()
+   }
+   
+})
+let date = new Date()
+document.getElementById('cr').innerHTML = date.getFullYear();
+function myFunction() {
+var x = document.getElementById("sideBar");
+if (x.style.display === "block") {
+x.style.display = "none";
+document.getElementById("mainContent").style.marginLeft = "0";
+} else {
+x.style.display = "block";
+document.getElementById("mainContent").style.marginLeft = "180px";
+
+}
+}
+        </script>
+</body>
+</html>

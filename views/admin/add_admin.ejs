@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="page icon" type="icon" href="/fcahptib.png">
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"> -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" 
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/style2.css">
+   <title>Add New Admin</title>
+   <style>
+      .add-admin{
+         height: fit-content;
+         width: fit-content;
+         background: #ffffff;
+         margin: auto;
+         margin-top: 10px;
+         padding: 20px;
+         display: flex;
+         flex-direction: column;
+      }
+      .add-admin h3{
+         text-align: left;
+         font-size: 18px;
+         font-family: calibri;
+      }
+      .add-admin form button{
+         border: none;
+         width: 100%;
+         padding: 10px;
+         font-size: 12pt;
+         cursor: pointer;
+         background-color: rgb(37, 164, 248);
+         color: #fff;
+      }
+      .add-admin input{
+            outline: none;
+            font-size: 16px;
+            font-family: Calibri;
+            width: 300px;
+            height: 30px;
+        }
+        select{
+            width: 310px;
+            height: 35px;
+        }
+   </style>
+</head>
+<body>
+  <div class="header">
+    <center><img src="/fcahptib.png" alt="" height="50"></center>
+    <h3 style="color: white; font-family: calibri; text-align: center;">
+        Administrator Section</h3>
+</div>
+  <div class="menu-bar">
+      <a href="/admin/dashboard">Dashboard</a>
+      <!-- Academic Session -->
+      <div class="dropdown">
+        <button class="dropbtn">Session
+          <i class="fa fa-caret-down"></i>
+        </button>
+        <div class="dropdown-content">
+          <a href="/admin/update_session">Update academic session</a>
+        </div>
+      </div>  
+      <!-- Academic Semester -->
+      <div class="dropdown">
+        <button class="dropbtn">Semester
+          <i class="fa fa-caret-down"></i>
+        </button>
+        <div class="dropdown-content">
+          <a href="/admin/update_semester">Update academic semester</a>
+        </div>
+      </div> 
+      <!-- result section -->
+      <div class="dropdown">
+          <button class="dropbtn">Result
+            <i class="fa fa-caret-down"></i>
+          </button>
+          <div class="dropdown-content">
+            <a href="/admin/upload_result">Upload result</a>
+            <a href="/admin/manage_result">Manage result</a>
+          </div>
+        </div>        
+
+        <!-- student section -->
+        <div class="dropdown">
+          <button class="dropbtn">Student
+            <i class="fa fa-caret-down"></i>
+          </button>
+          <div class="dropdown-content">
+            <a href="/admin/add_course">Add student</a>
+            <a href="/admin/manage_student">Manage student</a>
+          </div>
+        </div>
+         <!-- Admin section -->
+         <div class="dropdown">
+          <button class="dropbtn">Admin
+            <i class="fa fa-caret-down"></i>
+          </button>
+        <div class="dropdown-content">
+          <a href="/admin/add_admin">Add New Admin</a>
+          <a href="/admin/manage_admin">Manage Admin</a>
+        </div>
+        </div>
+      <!-- course section -->
+      <div class="dropdown">
+          <button class="dropbtn">Course
+            <i class="fa fa-caret-down"></i>
+          </button>
+          <div class="dropdown-content">
+            <a href="/admin/add_course">Add course</a>
+            <a href="/admin/manage_course">Manage courses</a>
+          </div>
+        </div>
+        <a href="/admin/logout" id="logout">Logout</a>
+        <a href="/admin/change_password">Change Password</a>
+      </div>
+   <div class="add-admin">
+      <h3>Add New Admin</h3><br>
+      <form action="/admin/add_admin" method="post">
+         <div class="" id="error" style="<%=style%>"><%=message%></div>            
+            <label>Username:</label><br>
+            <input type="text" name="username" required/><br><br>
+
+            <label>Password:</label><br>
+            <input type="password" name="password" required /><br><br>
+
+            <label>Confirm Password:</label><br>
+            <input type="password" name="confirm" required /><br><br>
+                <button type="submit">Submit</button>
+      </form>
+   </div>
+   <div class="footer">
+      <footer>
+         <span style="font-size: 15px; text-align: center;
+         font-style: normal; font-family: Arial, Helvetica, sans-serif; color: gray;">&copy; <span id="cr"></span> FCAHPTIB.</span>
+      </footer>
+      </div>
+    <script>
+        let date = new Date
+        document.getElementById("cr").innerHTML = date.getFullYear();
+        document.querySelector('#logout').addEventListener('click', (e)=>{
+      if(confirm('Are sure you want to logout?') == true){
+       fetch('/admin/logout',{
+       method: 'get'})
+      }else{
+       e.preventDefault()
+   }
+   
+})
+const errorMessage = document.getElementById('error')
+    if(errorMessage.innerHTML !== ''){
+        setTimeout(function(){
+            errorMessage.style.display = 'none'
+        },3000)
+    }
+    </script>
+</body>
+</html>

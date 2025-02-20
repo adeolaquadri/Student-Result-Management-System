@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <link rel="page icon" type="icon" href="/fcahptib.png">
+   <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"> -->
+   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+   <link rel="stylesheet" 
+   href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/style2.css">
+   <title>Update Academic Session</title>
+   <style>
+      .upload{
+         height: 350px;
+         width: 400px;
+         background: #ffffff;
+         margin: auto;
+         margin-top: 10px;
+         padding: 10px;
+         display: flex;
+         flex-direction: column;
+         justify-content:space-between
+      }
+      .upload h3{
+         text-align: left;
+         font-size: 18px;
+         font-family: calibri;
+      }
+      .upload form button{
+         border: none;
+         width: 100%;
+         padding: 10px;
+         font-size: 12pt;
+         cursor: pointer;
+         background-color: rgb(37, 164, 248);
+         color: #fff;
+      }
+      .upload form input{
+         width: 100%;
+
+      }
+   </style>
+</head>
+<body>
+  <div class="header">
+    <center><img src="/fcahptib.png" alt="" height="50"></center>
+    <h3 style="color: white; font-family: calibri; text-align: center;">
+        Administrator Section</h3>
+</div>
+   <!-- menu bar -->
+   <div class="menu-bar">
+      <a href="/admin/dashboard">Dashboard</a>
+      
+    <!-- Academic Session -->
+      <div class="dropdown">
+        <button class="dropbtn">Session
+          <i class="fa fa-caret-down"></i>
+        </button>
+        <div class="dropdown-content">
+          <a href="/admin/update_session">Update academic session</a>
+        </div>
+      </div>        
+         <!-- Academic Semester -->
+         <div class="dropdown">
+            <button class="dropbtn">Semester
+              <i class="fa fa-caret-down"></i>
+            </button>
+            <div class="dropdown-content">
+              <a href="/admin/update_semester">Update academic semester</a>
+            </div>
+          </div> 
+      <!-- result section -->
+      <div class="dropdown">
+          <button class="dropbtn">Result
+            <i class="fa fa-caret-down"></i>
+          </button>
+          <div class="dropdown-content">
+            <a href="/admin/upload_result">Upload result</a>
+            <a href="/admin/manage_result">Manage result</a>
+          </div>
+        </div>        
+
+        <!-- student section -->
+        <div class="dropdown">
+          <button class="dropbtn">Student
+            <i class="fa fa-caret-down"></i>
+          </button>
+          <div class="dropdown-content">
+            <a href="/admin/add_student">Add student</a>
+            <a href="/admin/manage_student">Manage student</a>
+          </div>
+        </div>
+         <!-- Admin section -->
+         <div class="dropdown">
+          <button class="dropbtn">Admin
+            <i class="fa fa-caret-down"></i>
+          </button>
+        <div class="dropdown-content">
+          <a href="/admin/add_admin">Add New Admin</a>
+          <a href="/admin/manage_admin">Manage Admin</a>
+        </div>
+        </div>
+      <!-- course section -->
+      <div class="dropdown">
+          <button class="dropbtn">Course
+            <i class="fa fa-caret-down"></i>
+          </button>
+          <div class="dropdown-content">
+            <a href="/admin/add_course">Add course</a>
+            <a href="/admin/manage_course">Manage courses</a>
+          </div>
+        </div>
+      <a href="/admin/logout" id="logout">Logout</a>
+      <a href="/admin/change_password">Change Password</a>
+  </div>
+   <div class="upload">
+      <h3>Update Academic Session</h3>
+      <div class="" id="error" style="<%=style%>"><%=message%></div>
+      <form action="/admin/update_session" method="post" >
+<label>Session:</label><br>
+<input type="number" name="session" id="" placeholder="e.g 2025" required minlength="4" maxlength="4">
+<br><br>
+        <button type="submit">Update</button>
+      </form>
+   </div>
+   <div class="footer">
+    <footer>
+       <span style="font-size: 15px; text-align: center;
+       font-style: normal; font-family: Arial, Helvetica, sans-serif; color: gray;">&copy; <span id="cr"></span> FCAHPTIB.</span>
+    </footer>
+    </div>
+  <script>
+      let date = new Date
+      document.getElementById("cr").innerHTML = date.getFullYear()
+      document.querySelector('#logout').addEventListener('click', (e)=>{
+      if(confirm('Are sure you want to logout?') == true){
+       fetch('/admin/logout',{
+       method: 'get'})
+      }else{
+       e.preventDefault()
+   }
+   
+})
+const errorMessage = document.getElementById('error')
+    if(errorMessage.innerHTML !== ''){
+        setTimeout(function(){
+            errorMessage.style.display = 'none'
+        },3000)
+    }
+  </script>
+</body>
+</html>

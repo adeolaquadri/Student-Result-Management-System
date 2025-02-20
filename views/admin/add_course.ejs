@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="page icon" type="icon" href="/fcahptib.png">
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"> -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" 
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/style2.css">
+   <title>Add Course</title>
+   <style>
+      .add-student{
+         height: fit-content;
+         width: fit-content;
+         background: #ffffff;
+         margin: auto;
+         margin-top: 10px;
+         padding: 15px;
+         display: flex;
+         flex-direction: column;
+         margin-top: 50px;
+      }
+      .add-student h3{
+         text-align: left;
+         font-size: 18px;
+         font-family: calibri;
+      }
+      .add-student form button{
+         border: none;
+         width: 100%;
+         padding: 10px;
+         font-size: 12pt;
+         cursor: pointer;
+         background-color: rgb(37, 164, 248);
+         color: #fff;
+      }
+      .add-student input{
+            outline: none;
+            font-size: 16px;
+            font-family: Calibri;
+            width: 300px;
+            height: 30px;
+        }
+        select{
+            width: 310px;
+            height: 35px;
+        }
+   </style>
+</head>
+<body>
+   <!-- header section -->
+   <div class="header">
+    <center><img src="/fcahptib.png" alt="" height="50"></center>
+    <h3 style="color: white; font-family: calibri; text-align: center;">
+        Administrator Section</h3>
+</div>
+
+  <!-- menu-bar section -->
+  <div class="menu-bar">
+      <a href="/admin/dashboard">Dashboard</a>
+      <!-- Academic Session -->
+      <div class="dropdown">
+         <button class="dropbtn">Session
+           <i class="fa fa-caret-down"></i>
+         </button>
+         <div class="dropdown-content">
+           <a href="/admin/update_session">Update academic session</a>
+         </div>
+       </div>  
+       <!-- Academic Semester -->
+       <div class="dropdown">
+         <button class="dropbtn">Semester
+           <i class="fa fa-caret-down"></i>
+         </button>
+         <div class="dropdown-content">
+           <a href="/admin/update_semester">Update academic semester</a>
+         </div>
+       </div> 
+      <!-- result section -->
+      <div class="dropdown">
+          <button class="dropbtn">Result
+            <i class="fa fa-caret-down"></i>
+          </button>
+          <div class="dropdown-content">
+            <a href="/admin/upload_result">Upload result</a>
+            <a href="/admin/manage_result">Manage result</a>
+          </div>
+        </div>        
+
+        <!-- student section -->
+        <div class="dropdown">
+          <button class="dropbtn">Student
+            <i class="fa fa-caret-down"></i>
+          </button>
+          <div class="dropdown-content">
+            <a href="/admin/add_student">Add student</a>
+            <a href="/admin/manage_student">Manage student</a>
+          </div>
+        </div>
+         <!-- Admin section -->
+         <div class="dropdown">
+          <button class="dropbtn">Admin
+            <i class="fa fa-caret-down"></i>
+          </button>
+        <div class="dropdown-content">
+          <a href="/admin/add_admin">Add New Admin</a>
+          <a href="/admin/manage_admin">Manage Admin</a>
+        </div>
+        </div>
+      <!-- course section -->
+      <div class="dropdown">
+          <button class="dropbtn">Course
+            <i class="fa fa-caret-down"></i>
+          </button>
+          <div class="dropdown-content">
+            <a href="/admin/add_course">Add course</a>
+            <a href="/admin/manage_course">Manage courses</a>
+          </div>
+        </div>
+      <a href="/admin/logout" id="logout">Logout</a>
+      <a href="/admin/change_password">Change Password</a>
+  </div>
+   <div class="add-student">
+      <h3>Add New Course</h3>
+      <form action="/admin/add_course" method="post">
+         <div id="error" class="" style="<%=style%>"><%=message%></div>
+         
+         <!-- course code -->
+            <label>Course Code:</label><br>
+            <input type="text" name="courseid" placeholder="STA 111" required /><br><br>
+
+         <!-- course title -->
+            <label>Course Title:</label><br>
+            <input type="text" name="coursetitle" required/><br><br>
+         <!-- course unit -->
+            <label>Course Unit:</label><br>
+            <input type="number" name="courseunit" required/><br><br>
+         <!-- semester -->
+            <label>Semester:</label><br>
+            <select name="semester" id="" required>
+                <option value="" selected>--select semester--</option>
+                <option value="First">First</option>
+                <option value="Second">Second</option>
+                    </select><br><br>
+         <!-- department -->
+            <label>Department:</label><br>
+                <select name="department" id="" required>
+                    <option value="" selected>--select department--</option>
+                    <option value="Animal Health and Production Technology">
+                        Animal Health and Production Technology</option>
+                    <option value="Computer Science">Computer Science</option>
+                    <option value="Fisheries Technology">Fisheries Technology</option>
+                    <option value="Science Laboratory Technology">Science Laboratory Technology</option>
+                    <option value="Statistics">Statistics</option>
+                    <option value="Veterinary Laboratory Technology">Veterinary Laboratory Technology</option>
+                    <option value="Animal Health Technology">Animal Health Technology</option>
+                    <option value="Animal Production Technology">Animal Production Technology</option>
+                    <option value="Agribusiness Management">Agribusiness Management</option>
+                    <option value="Agricultural Extension and Management">Agricultural Extension and Management</option>
+                    <option value="Pasture and Range Management">Pasture and Range Management</option>
+                    <option value="Fisheries">Fisheries</option>
+                    <option value="Biochemistry">Biochemistry</option>
+                    <option value="Environmental Biology">Environmental Biology</option>
+                    <option value="Microbiology">Microbiology</option>
+                    <option value="Physics&Electronics">Physics&Electronics</option>
+                    <option value="Software and Web Development">Software and Web Development</option>
+                    <option value="Networking and Cloud Computing">Networking and Cloud Computing</option>
+                </select><br><br>
+               <!-- level  -->
+                <label for="">Level:</label><br>
+                    <select name="level" id="" required/>
+                    <option value="" selected>--select your current level</option>
+                    <option value="ND1">ND1</option>
+                    <option value="ND2">ND2</option>
+                    <option value="HND1">HND1</option>
+                    <option value="HND2">HND2</option>
+                </select><br><br>
+                <!-- submit button -->
+                <button type="submit">Submit</button>
+      </form>
+   </div>
+   <!-- footer section -->
+   <div class="footer">
+      <footer>
+         <span style="font-size: 15px; text-align: center;
+         font-style: normal; font-family: Arial, Helvetica, sans-serif; color: gray;">&copy; <span id="cr"></span> FCAHPTIB.</span>
+      </footer>
+      </div>
+      <!-- javascript code -->
+    <script>
+        let date = new Date
+        document.getElementById("cr").innerHTML = date.getFullYear();
+        document.querySelector('#logout').addEventListener('click', (e)=>{
+      if(confirm('Are sure you want to logout?') == true){
+       fetch('/admin/logout',{
+       method: 'get'})
+      }else{
+       e.preventDefault()
+   }
+   
+})
+const errorMessage = document.getElementById('error')
+    if(errorMessage.innerHTML !== ''){
+        setTimeout(function(){
+            errorMessage.style.display = 'none'
+        },3000)
+    }
+    </script>
+</body>
+</html>

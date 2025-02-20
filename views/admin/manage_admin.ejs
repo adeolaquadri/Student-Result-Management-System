@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Manage Admin</title>
+   <link rel="page icon" type="icon" href="/fcahptib.png">
+   <link rel="stylesheet" 
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+   <link rel="stylesheet" href="/style2.css">
+   <style>
+     .display-result{
+         padding: 10px;
+         margin: auto;
+         overflow-x: scroll;
+      }
+      #students{
+         width: 100%;
+         border-collapse: collapse;
+         font-family: Arial, Helvetica, sans-serif;
+         overflow-x: scroll;
+      }
+      #students td, #students th{
+         /* padding: 8px; */
+         text-transform: capitalize;
+         text-align: center;
+         border-bottom: 1px solid #ddd;
+      }
+      #students th{
+         background-color: rgb(175, 35, 35);
+         color: white;
+         font-size: 14px;
+         text-align: center;
+         padding: 10px;
+      }
+      #students td{
+         font-size: 12px;
+         background-color: #f2f2f2;
+         justify-content: center;
+      }
+      .deletebtn{
+        border: none;
+        cursor: pointer;
+        background-color: rgb(175, 35, 35);
+        padding: 5px;
+        font-size: 14px;
+        font-family: calibri;
+        border-radius: 2px;
+        width: 70px;
+      }
+      .updatebtn{
+        border: none;
+        cursor: pointer;
+        background-color:rgb(37, 164, 248);
+        padding: 5px;
+        font-size: 14px;
+        font-family: calibri;
+        border-radius: 2px;
+        width: 70px;
+      }
+      .mydata{
+        border: none;
+        background: transparent;
+        text-align: center;
+      }
+      .hidden {
+       clip: rect(0 0 0 0);
+       clip-path: inset(50%);
+       height: 1px;
+       overflow: hidden;
+       position: absolute;
+       white-space: nowrap;
+       width: 1px;
+      }
+      .pagination{
+        margin-top: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .pagination button{
+        border: none;
+        float: left;
+        padding: 8px 16px;
+        background: transparent;
+        transition: background-color .3s;
+      }
+      .pagination button:hover{
+        background-color: rgb(37, 164, 248);
+      }
+   </style>
+</head>
+<body>
+   <div class="header">
+      <center><img src="/fcahptib.png" alt="" height="50"></center>
+      <h3 style="color: white; font-family: calibri; text-align: center;">
+          Administrator Section</h3>
+  </div>
+  <div class="menu-bar">
+      <a href="/admin/dashboard">Dashboard</a>
+      <!-- Academic Session -->
+      <div class="dropdown">
+         <button class="dropbtn">Session
+           <i class="fa fa-caret-down"></i>
+         </button>
+         <div class="dropdown-content">
+           <a href="/admin/update_session">Update academic session</a>
+         </div>
+       </div>  
+       <!-- Academic Semester -->
+       <div class="dropdown">
+         <button class="dropbtn">Semester
+           <i class="fa fa-caret-down"></i>
+         </button>
+         <div class="dropdown-content">
+           <a href="/admin/update_semester">Update academic semester</a>
+         </div>
+       </div> 
+      <!-- result section -->
+      <div class="dropdown">
+          <button class="dropbtn">Result
+            <i class="fa fa-caret-down"></i>
+          </button>
+          <div class="dropdown-content">
+            <a href="/admin/upload_result">Upload result</a>
+            <a href="/admin/manage_result">Manage result</a>
+          </div>
+        </div>        
+
+        <!-- student section -->
+        <div class="dropdown">
+          <button class="dropbtn">Student
+            <i class="fa fa-caret-down"></i>
+          </button>
+          <div class="dropdown-content">
+            <a href="/admin/add_student">Add student</a>
+            <a href="/admin/manage_student">Manage student</a>
+          </div>
+        </div>
+        <!-- Admin section -->
+        <div class="dropdown">
+          <button class="dropbtn">Admin
+            <i class="fa fa-caret-down"></i>
+          </button>
+        <div class="dropdown-content">
+          <a href="/admin/add_admin">Add New Admin</a>
+          <a href="/admin/manage_admin">Manage Admin</a>
+        </div>
+        </div>
+      <!-- course section -->
+      <div class="dropdown">
+          <button class="dropbtn">Course
+            <i class="fa fa-caret-down"></i>
+          </button>
+          <div class="dropdown-content">
+            <a href="/admin/add_course">Add course</a>
+            <a href="/admin/manage_course">Manage courses</a>
+          </div>
+        </div>
+      <a href="/admin/logout" id="logout">Logout</a>
+      <a href="/admin/change_password">Change Password</a>
+  </div>
+  <!-- <div>
+      <p>Current Session:</p>
+      <p>Current Semester:</p>
+      <p>Date:<span id="Cdate"></span></p>
+  </div> -->
+   <div class="display-result">
+    <p style="margin: 10px 0px 0px 30px; font-size: 21px; font-family: 'Times New Roman', Times, serif">
+      Manage Admin</p>
+         <article class="innerTable">
+      <table id="students">
+         <tr>
+         <th>S/N</th>
+         <th>Username</th>
+         <th>Password</th>
+         <th>Action</th>
+         
+         </tr>
+         <%for(let i = 1; i < result.length; i++){%>
+         <%result.forEach(res => {%>
+         <tr id="data">
+            <td><%=i++%></td>
+            <td><%=res.username%></td>
+            <td><input type="password" value="<%=res.password%>" disabled></td>
+            <td style="display: flex; gap: 10px;">
+              <button class="updatebtn">Update<i class="fa fa-edit"></i>
+              </button>
+              <button class="deletebtn">Delete<i class="fa fa-trash-o"></i>
+              </button></td>
+         </tr>
+         <%})%>
+         <%}%>
+      </table>
+      </article>
+   </div>
+   <!-- <table id="std">
+    <tr>
+      <th>Name</th>
+      <th>Age</th>
+      <th>Sex</th>
+      </tr>
+      <tr id="data">
+      <td>Adeola</td>
+      <td>19</td>
+      <td>Male</td>
+    </tr>
+    <button onclick="del()">delete</button> -->
+   </table>
+   <div class="footer">
+      <footer>
+         <span style="font-size: 15px; text-align: center;
+         font-style: normal; font-family: Arial, Helvetica, sans-serif; color: gray;">&copy; <span id="cr"></span> FCAHPTIB.</span>
+      </footer>
+      </div>
+    <script>
+  let date = new Date
+  document.getElementById("cr").innerHTML = date.getFullYear();
+
+  document.querySelector('#logout').addEventListener('click', (e)=>{
+      if(confirm('Are sure you want to logout?') == true){
+       fetch('/admin/logout',{
+       method: 'get'})
+      }else{
+       e.preventDefault()
+   }
+   
+})
+// document.querySelector('#deletestd').addEventListener('click', (e)=>{
+//       if(confirm('Are sure you want to logout?') == true){
+//       window.location.href = "/admin/dashboard"
+//       }else{
+//        e.preventDefault()
+//    }
+// })
+function del(){
+  var parent = document.getElementById("std")
+  var data = document.getElementById('data');
+  data.remove()
+}
+function edit(){
+  document.getElementById('input').attributes.type = 'text'
+}
+//when all documents are fully loaded
+document.addEventListener('DOMContentLoaded', function () {
+  const content = document.querySelector('.innerTable'); 
+  const itemsPerPage = 10;
+  let currentPage = 0;
+  const items = Array.from(content.getElementsByTagName('tr')).slice(1);
+
+  //Show page function
+  function showPage(page) {
+  const startIndex = page * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  items.forEach((item, index) => {
+    item.classList.toggle('hidden', index < startIndex || index >= endIndex);
+  });
+  updateActiveButtonStates();
+}
+
+//Create page buttons function
+function createPageButtons() {
+  const totalPages = Math.ceil(items.length / itemsPerPage);
+  const paginationContainer = document.createElement('div');
+  const paginationDiv = document.body.appendChild(paginationContainer);
+  paginationContainer.classList.add('pagination');
+
+for (let i = 0; i < totalPages; i++) {
+const pageButton = document.createElement('button');
+pageButton.textContent = i + 1;
+pageButton.addEventListener('click', () => {
+  currentPage = i;
+  showPage(currentPage);
+  updateActiveButtonStates();
+})
+content.appendChild(paginationContainer);
+paginationDiv.appendChild(pageButton);
+}
+}
+function updateActiveButtonStates() {
+  const pageButtons = document.querySelectorAll('.pagination button');
+  pageButtons.forEach((button, index) => {
+    if (index === currentPage) {
+      button.classList.add('active');
+    } else {
+      button.classList.remove('active');
+    }
+  })
+}
+createPageButtons();
+showPage(currentPage);
+})
+    </script>
+</body>
+</html>
