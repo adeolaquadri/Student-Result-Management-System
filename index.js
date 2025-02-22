@@ -8,7 +8,6 @@ const fs = require('fs')
 const csv = require('fast-csv')
 const path = require('path')
 const multer = require('multer')
-const { connect } = require('http2')
 //setup my server
 const app = express()
 app.listen(process.env.serverPort, ()=>console.log(`server is running on port ${process.env.serverPort}`))
@@ -1199,7 +1198,7 @@ app.post('/admin/add_admin', (req, res)=>{
                     </html>
 
                     `)
-            }else if(req.body.confirm != req.body.password){
+            }else if(req.body.confirm !== req.body.password){
                 const message = "Passwords are not match!"
                 const style = "font-size: 18px; font-family: calibri; background-color: rgba(248, 2, 2, 0.35);padding: 10px; width: 100%; justify-content: center; border-radius: 5px;"
                 res.render('admin/add_admin',{
@@ -1274,7 +1273,7 @@ app.post('/new_password', (req, res)=>{
             if(err) throw err
             var current_level = null
             if(result.length==1){
-                if(req.body.confirmpassword != req.body.newpassword){
+                if(req.body.confirmpassword !== req.body.newpassword){
                     const message = 'Passwords do not match'
                     const style = "font-size: 18px; font-family: calibri; background-color: rgba(248, 2, 2, 0.35);padding: 10px; width: 100%; justify-content: center; border-radius: 5px;"
                     res.render('student/changepassword', {

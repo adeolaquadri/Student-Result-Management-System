@@ -19,7 +19,7 @@ body{
 }
 .menu-bar a{
     float: left;
-    font-size: 16px;
+    font-size: 14px;
     color: white;
     text-align: center;
     padding: 14px 16px;
@@ -30,7 +30,7 @@ body{
     overflow: hidden;
 }
 .dropdown .dropbtn {
-    font-size: 16px;
+    font-size: 14px;
     border: none;
     outline: none;
     color: white;
@@ -94,9 +94,9 @@ body{
 }
 
 .dash p{
-    font-size: 14pt;
+    font-size: 12pt;
     font-style: normal;
-    font-family: times;
+    /* font-family: times; */
     /* text-transform: uppercase; */
     color: #fff;
 }
