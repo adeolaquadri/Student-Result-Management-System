@@ -5,9 +5,14 @@
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <title>Reprint Course Form</title>
    <style>
+   *{
+      margin: 0;
+      box-sizing: border-box;
+      padding: 0;
+   }
    .bioTable{
         width: 100%;
-        border: 1px solid;
+        /* border: 1px solid; */
         padding: 5px;
    }
    .bioTable td{
@@ -16,6 +21,8 @@
    }
     .resultTable{
       width: 100%;
+      border-collapse: collapse;
+      margin-top: 5%;
     }
    .resultTable, .resultTable th, .resultTable td{
       border: 1px solid;
@@ -27,48 +34,24 @@
    }
    .heading{
       width: 100%;
-      border: 1px solid;
+      /* border: 1px solid; */
    }
    .sub-heading{
       width: 100%;
    }
    .sub-heading, .sub-heading th{
-      border: 1px solid;
+      /* border: 1px solid; */
       padding: 2px;
       text-align: center;
    }
    </style>
 </head>
 <body>
-   <!-- <div>
-      <table class="heading">
-         <tbody>
-            <tr>
-            <center>
-               <td>
-               <img src="/fcahptib.png" height="50" alt="">
-               <h2 style="font-size: 16pt;">FEDERAL COLLEGE OF ANIMAL HEALTH AND PRODUCTION TECHNOLOGY, IBADAN.</h2>
-            </td>   
-            </center>
-               </tr>
-               </tbody>
-       </table> -->
-       <table class="heading">
-         <tr>
-      <th><h2 style="font-size: 18pt; text-align: center;">
+      <h2 style="font-size: 18pt; text-align: center;">
          <center>
          <img src="/fcahptib.png" height="50" alt=""></center>
-         FEDERAL COLLEGE OF ANIMAL HEALTH AND PRODUCTION TECHNOLOGY, IBADAN.</h2>
-         <h3>Student's Course Form</h3>
-      </th>
-      </tr>
-         </center>
-      </table>
-      <!-- <table class="sub-heading">
-         <tr>
-      <td><h3>Student's Course Form</h3></td>
-      </tr>
-      </table> -->
+         FEDERAL COLLEGE OF ANIMAL HEALTH AND PRODUCTION TECHNOLOGY, IBADAN.</h2><br>
+          <h3 style="text-align: center;">Student's Course Form</h3><br>
    <table class="bioTable">
       <tr>
           <td><b>Student Name:</b></td><td style="font-family: monospace;"><%=fullname%></td>

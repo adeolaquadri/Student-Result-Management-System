@@ -12,7 +12,7 @@
    <title>Upload Result</title>
    <style>
       .upload{
-         height: 350px;
+         height: auto;
          width: 400px;
          background: #ffffff;
          margin: auto;
@@ -26,6 +26,7 @@
          text-align: left;
          font-size: 18px;
          font-family: calibri;
+         border-bottom: 1px solid #ccc;
       }
       .upload form button{
          border: none;
@@ -38,7 +39,9 @@
       }
       .upload form input{
          width: 100%;
-
+      }
+      .upload p{
+        font-size: 13px;
       }
    </style>
 </head>
@@ -113,7 +116,7 @@
       <a href="/admin/change_password">Change Password</a>
   </div>
    <div class="upload">
-      <h3>Upload Student Result</h3>
+      <h3>Upload Student Result</h3><br>
       <div class="" id="error" style="<%=style%>"><%=message%></div>
       <form action="/admin/upload_result" method="post" enctype="multipart/form-data">
         <label>Level:</label><br>
@@ -137,14 +140,21 @@
 <br><br>
 
          <input type="file" name="file" accept="csv" required/><br><br>
+         <p><b>NB:</b>The file must be in excel file (.csv) <br> and contains header [matric_number, 
+          courseId, courseTitle, Score, courseUnit accordingly]</p> <br>
         <button type="submit">Upload Result</button>
       </form>
    </div>
    <div class="footer">
     <footer>
-       <span style="font-size: 15px; text-align: center;
-       font-style: normal; font-family: Arial, Helvetica, sans-serif; color: gray;">&copy; <span id="cr"></span> FCAHPTIB.</span>
-    </footer>
+      <p style="font-size: 15px; text-align: center;
+      font-style: normal; color: gray;">
+      <span id="cr"></span> &copy;FCAHPTIB.</p>
+      <p style="font-size: 14px; text-align: center;
+      font-style: normal; color: gray;">Designed by Adeola Quadri. A</p>
+      <p style="font-size: 14px; text-align: center;
+      font-style: normal; color: gray;">Supervised by Dr. Mrs Olarenwaju O T.</p>
+   </footer>
     </div>
   <script>
       let date = new Date

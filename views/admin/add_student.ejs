@@ -25,6 +25,7 @@
          text-align: left;
          font-size: 18px;
          font-family: calibri;
+         border-bottom: 1px solid #ccc;
       }
       .add-student form button{
          border: none;
@@ -45,6 +46,9 @@
         select{
             width: 310px;
             height: 35px;
+        }
+        .add-student p{
+          font-size: 13px;
         }
    </style>
 </head>
@@ -122,15 +126,23 @@
       <h3>Add Student</h3><br>
         <div class="" style="<%=style%>"><%=message%></div>
         <form action="/admin/upload_student" method="post" enctype="multipart/form-data">
+          <label>Choose a file to upload:</label><br>
            <input type="file" name="file" accept="csv" required/><br><br>
+           <p><b>NB:</b>The file must be in excel file (.csv) <br> and contains header [courseId, courseTitle, 
+            courseUnit, Semester, Department, Level]</p><br>
           <button type="submit">Upload Student</button>
         </form>
      </div>
    <div class="footer">
-      <footer>
-         <span style="font-size: 15px; text-align: center;
-         font-style: normal; font-family: Arial, Helvetica, sans-serif; color: gray;">&copy; <span id="cr"></span> FCAHPTIB.</span>
-      </footer>
+    <footer>
+      <p style="font-size: 15px; text-align: center;
+      font-style: normal; color: gray;">
+      <span id="cr"></span> &copy;FCAHPTIB.</p>
+      <p style="font-size: 14px; text-align: center;
+      font-style: normal; color: gray;">Designed by Adeola Quadri. A</p>
+      <p style="font-size: 14px; text-align: center;
+      font-style: normal; color: gray;">Supervised by Dr. Mrs Olarenwaju O T.</p>
+   </footer>
       </div>
     <script>
         let date = new Date

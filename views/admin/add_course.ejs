@@ -26,6 +26,10 @@
          text-align: left;
          font-size: 18px;
          font-family: calibri;
+         border-bottom: 1px solid #ccc;
+      }
+      .add-student p{
+        font-size: 13px;
       }
       .add-student form button{
          border: none;
@@ -123,70 +127,27 @@
       <a href="/admin/change_password">Change Password</a>
   </div>
    <div class="add-student">
-      <h3>Add New Course</h3>
-      <form action="/admin/add_course" method="post">
-         <div id="error" class="" style="<%=style%>"><%=message%></div>
-         
-         <!-- course code -->
-            <label>Course Code:</label><br>
-            <input type="text" name="courseid" placeholder="STA 111" required /><br><br>
-
-         <!-- course title -->
-            <label>Course Title:</label><br>
-            <input type="text" name="coursetitle" required/><br><br>
-         <!-- course unit -->
-            <label>Course Unit:</label><br>
-            <input type="number" name="courseunit" required/><br><br>
-         <!-- semester -->
-            <label>Semester:</label><br>
-            <select name="semester" id="" required>
-                <option value="" selected>--select semester--</option>
-                <option value="First">First</option>
-                <option value="Second">Second</option>
-                    </select><br><br>
-         <!-- department -->
-            <label>Department:</label><br>
-                <select name="department" id="" required>
-                    <option value="" selected>--select department--</option>
-                    <option value="Animal Health and Production Technology">
-                        Animal Health and Production Technology</option>
-                    <option value="Computer Science">Computer Science</option>
-                    <option value="Fisheries Technology">Fisheries Technology</option>
-                    <option value="Science Laboratory Technology">Science Laboratory Technology</option>
-                    <option value="Statistics">Statistics</option>
-                    <option value="Veterinary Laboratory Technology">Veterinary Laboratory Technology</option>
-                    <option value="Animal Health Technology">Animal Health Technology</option>
-                    <option value="Animal Production Technology">Animal Production Technology</option>
-                    <option value="Agribusiness Management">Agribusiness Management</option>
-                    <option value="Agricultural Extension and Management">Agricultural Extension and Management</option>
-                    <option value="Pasture and Range Management">Pasture and Range Management</option>
-                    <option value="Fisheries">Fisheries</option>
-                    <option value="Biochemistry">Biochemistry</option>
-                    <option value="Environmental Biology">Environmental Biology</option>
-                    <option value="Microbiology">Microbiology</option>
-                    <option value="Physics&Electronics">Physics&Electronics</option>
-                    <option value="Software and Web Development">Software and Web Development</option>
-                    <option value="Networking and Cloud Computing">Networking and Cloud Computing</option>
-                </select><br><br>
-               <!-- level  -->
-                <label for="">Level:</label><br>
-                    <select name="level" id="" required/>
-                    <option value="" selected>--select your current level</option>
-                    <option value="ND1">ND1</option>
-                    <option value="ND2">ND2</option>
-                    <option value="HND1">HND1</option>
-                    <option value="HND2">HND2</option>
-                </select><br><br>
-                <!-- submit button -->
-                <button type="submit">Submit</button>
-      </form>
+      <h3>Add Courses</h3><br>
+      <div style="<%=style%>" id="message"><%=message%></div>
+      <form action="/admin/upload_courses" method="post" enctype="multipart/form-data">
+        <label>Choose file to upload:</label><br>
+        <input type="file" name="file" accept="csv" required/><br><br>
+        <p><b>NB:</b>The file must be in excel file (.csv) <br> and contains header [courseId, courseTitle, 
+          courseUnit, Semester, Department, Level accordingly]</p><br>
+       <button type="submit">Upload Courses</button>
+     </form>
    </div>
    <!-- footer section -->
    <div class="footer">
-      <footer>
-         <span style="font-size: 15px; text-align: center;
-         font-style: normal; font-family: Arial, Helvetica, sans-serif; color: gray;">&copy; <span id="cr"></span> FCAHPTIB.</span>
-      </footer>
+    <footer>
+      <p style="font-size: 15px; text-align: center;
+      font-style: normal; color: gray;">
+      <span id="cr"></span> &copy;FCAHPTIB.</p>
+      <p style="font-size: 14px; text-align: center;
+      font-style: normal; color: gray;">Designed by Adeola Quadri. A</p>
+      <p style="font-size: 14px; text-align: center;
+      font-style: normal; color: gray;">Supervised by Dr. Mrs Olarenwaju O T.</p>
+   </footer>
       </div>
       <!-- javascript code -->
     <script>
@@ -201,7 +162,7 @@
    }
    
 })
-const errorMessage = document.getElementById('error')
+const errorMessage = document.getElementById('message')
     if(errorMessage.innerHTML !== ''){
         setTimeout(function(){
             errorMessage.style.display = 'none'
