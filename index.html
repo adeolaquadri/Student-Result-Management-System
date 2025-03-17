@@ -3,177 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Portal</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:ital,wght@0,100;0,300;0,400;0,500;0,700;0,800;0,900;1,100;1,300;1,400;1,500;1,700;1,800;1,900&family=Playwrite+DE+Grund:wght@100..400&family=Sofia&display=swap" rel="stylesheet">
-    <script src="jquery-3.7.1.min.js"></script>
+    <title>Table Pagination & Filtering</title>
     <style>
-        @media only screen and (min-width: 768px){
-            .header{width: 100px;}
-        }
-        *{
-            margin: 0;
-            box-sizing: border-box;
-        }
-        body{
-            background-color: rgb(240, 247, 253);
-        }
-        .header{
-            width: 100%;
-            height: 150px;
-            position: sticky;
-            top: 0;
-            background-color: rgb(167, 50, 50);
-            display: flex;
-        }
-        .header h1{
-            color: white;
-            margin-top: 2%;
-            font-family:Alegreya sans;
-        }
-        .form{
-            /* margin: auto; */
-            /* margin-top: 5%; */
-            width: max-content;
-            height: fit-content;
-            background-color: white;
-            padding: 1%;
-        }
-        input{
-            outline: none;
-            font-size: 16px;
-            font-family: Playwrite DE Grund;
-            width: 300px;
-            height: 30px;
-        }
-        select{
-            width: 310px;
-            height: 35px;
-        }
-        td label{
-            font-size: 20px;
-            font-family: Playwrite DE Grund;
-            /* color: white; */
-        }
-        .form h3{
-            /* color: white; */
-            text-align: center;
-            font-family: sofia;
-            /* text-shadow: 2px 3px 4px; */
-            font-size: 35px;
-        }
-        td button{
-            font-size: 20px;
-            font-family: serif;
-            color: white;
-            background-color: rgb(167, 50, 50);
-            border: none;
-            outline: none;
-            cursor: pointer;
-            width: 150px;
-            height: 50px;
-            border-radius: 7px;
-            /* margin-left: 100%; */
-            /* height: 50px; */
-        }
-        table{
-            display: flex;
-            row-gap: 50%;
-            padding: auto;
-        }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .pagination { margin-top: 10px; }
+        .pagination button { padding: 5px 10px; margin: 2px; cursor: pointer; }
     </style>
 </head>
 <body>
-    <div class="header">
-        
-        <img src="fcahptib.png" ><h1>Federal College of Animal Health and Production Technology, Ibadan.<br>
-            <span style="text-decoration: underline; margin-left: 40%; font-size: 25px;
-        ">Student Result Portal</span>
-        </h1>
-        
-    </div>
-    <div class="form">
-        <h3>Register Here</h3>
-        <form action="">
-            <table>
-                <tbody>
-            <tr>
-                <td><label>Matriculation No:</label></td>
-                <td><input type="text" name="matric" required /></td>
-                </tr>
 
-                <tr>
-                <td><label>Email Address:</label></td>
-                <td><input type="email" name="email" required /></td>
-            </tr>
+    <input type="text" id="searchInput" placeholder="Search..." onkeyup="filterTable()">
+    <table id="dataTable">
+        <thead>
             <tr>
-                <br><td><label>Lastname:</label></td>
-                <td><input type="text" name="lastname" required/></td>
-                </tr>
-                <tr>
-                <td><label>Firstname:</label></td>
-                <td><input type="text" name="firstname" required/></td>
+                <th>Name</th>
+                <th>Age</th>
+                <th>Country</th>
             </tr>
+        </thead>
+        <tbody>
+            <tr><td>Alice</td><td>25</td><td>USA</td></tr>
+            <tr><td>Bob</td><td>30</td><td>UK</td></tr>
+            <tr><td>Charlie</td><td>28</td><td>Canada</td></tr>
+            <tr><td>David</td><td>35</td><td>Germany</td></tr>
+            <tr><td>Emma</td><td>27</td><td>France</td></tr>
+            <tr><td>Fiona</td><td>32</td><td>Italy</td></tr>
+            <tr><td>George</td><td>29</td><td>Spain</td></tr>
+            <tr><td>Hannah</td><td>26</td><td>Netherlands</td></tr>
+            <tr><td>Isaac</td><td>31</td><td>Sweden</td></tr>
+            <tr><td>Jack</td><td>33</td><td>Australia</td></tr>
+        </tbody>
+    </table>
 
-            <tr>
-                <td><label>Middlename:</label></td>
-                <td><input type="text" name="middlename" required/></td>
-           </tr>
-           <tr>
-                <td><label>Department:</label></td>
-                <td><select name="department" id="" required/>
-                    <option value=""></option>
-                    <option value="Animal Health and Production Technology(ND)">
-                        Animal Health and Production Technology(ND)</option>
-                    <option value="Computer Science(ND)">Computer Science(ND)</option>
-                    <option value="Fisheries Technology(ND)">Fisheries Technology(ND)</option>
-                    <option value="Science Laboratory Technology(ND)">Science Laboratory Technology(ND)</option>
-                    <option value="Statistics(ND)">Statistics(ND)</option>
-                    <option value="Veterinary Laboratory Technology(ND)">Veterinary Laboratory Technology(ND)</option>
-                    <option value="Animal Health Technology(HND)">Animal Health Technology(HND)</option>
-                    <option value="Animal Production Technology(HND)">Animal Production Technology(HND)</option>
-                    <option value="Agribusiness Management(HND)">Agribusiness Management(HND)</option>
-                    <option value="Agricultural Extension and Management(HND)">Agricultural Extension and Management(HND)</option>
-                    <option value="Pasture and Range Management(HND)">Pasture and Range Management(HND)</option>
-                    <option value="Fisheries(HND)">Fisheries(HND)</option>
-                    <option value="Biochemistry(HND)">Biochemistry(HND)</option>
-                    <option value="Environmental Biology(HND)">Environmental Biology(HND)</option>
-                    <option value="Microbiology(HND)">Microbiology(HND)</option>
-                    <option value="Physics&Electronics(HND)">Physics&Electronics(HND)</option>
-                    <option value="Software and Web Development(HND)">Software and Web Development(HND)</option>
-                    <option value="Networking and Cloud Computing(HND)">Networking and Cloud Computing(HND)</option>
-                </select></td>
-            </tr>
-            <tr>
-                <td><label>Year of Admission:</label></td>
-                <td>
-                    <select name="admissionYear" id="" required/>
-                        <option value=""></option>
-                        <option value="2023">2023</option>
-                        <option value="2024">2024</option>
-                    </select>
-                </td>
-                </tr>
-                <tr>
-                <td><label>Level:</label></td>
-                <td>
-                    <select name="level" id="" required/>
-                    <option value=""></option>
-                    <option value="ND1">ND1</option>
-                    <option value="ND2">ND2</option>
-                    <option value="HND1">HND1</option>
-                    <option value="HND2">HND2</option>
-                </select>
-                </td>
-            </tr>
-            <tr>
-                <td><button type="submit">Submit</button></td>
-            </tr>
-            </tbody>
-            </table>
-        </form>
+    <div class="pagination">
+        <button id="prevBtn" onclick="prevPage()">Previous</button>
+        <span id="pageNumber"></span>
+        <button id="nextBtn" onclick="nextPage()">Next</button>
     </div>
-    
+
+    <script>
+        let currentPage = 1;
+        const rowsPerPage = 5;
+
+        function paginateTable() {
+            const searchValue = document.getElementById("searchInput").value.toLowerCase();
+            const rows = document.querySelectorAll("#dataTable tbody tr");
+
+            let filteredRows = [...rows].filter(row => row.innerText.toLowerCase().includes(searchValue));
+
+            const totalPages = Math.ceil(filteredRows.length / rowsPerPage) || 1;
+            currentPage = Math.max(1, Math.min(currentPage, totalPages));
+
+            document.getElementById("pageNumber").innerText = `Page ${currentPage} of ${totalPages}`;
+
+            rows.forEach(row => (row.style.display = "none"));
+
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = startIndex + rowsPerPage;
+            filteredRows.slice(startIndex, endIndex).forEach(row => (row.style.display = ""));
+
+            document.getElementById("prevBtn").disabled = currentPage === 1;
+            document.getElementById("nextBtn").disabled = currentPage >= totalPages;
+        }
+
+        function nextPage() {
+            currentPage++;
+            paginateTable();
+        }
+
+        function prevPage() {
+            currentPage--;
+            paginateTable();
+        }
+
+        function filterTable() {
+            currentPage = 1;
+            paginateTable();
+        }
+
+        // Initial pagination
+        paginateTable();
+    </script>
+
 </body>
 </html>

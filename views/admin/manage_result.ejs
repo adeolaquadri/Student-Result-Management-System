@@ -14,26 +14,26 @@
          margin: auto;
          overflow-x: scroll;
       }
-      #student-result{
+      #resultsData{
          width: 100%;
          border-collapse: collapse;
          font-family: Arial, Helvetica, sans-serif;
          overflow-x: scroll;
       }
-      #student-result td, #student-result th{
+      #resultsData td, #resultsData th{
          /* padding: 8px; */
          text-transform: capitalize;
          text-align: center;
          border-bottom: 1px solid #ddd;
       }
-      #student-result th{
+      #resultsData th{
          background-color: rgb(175, 35, 35);
          color: white;
          font-size: 14px;
          text-align: center;
          padding: 10px;
       }
-      #student-result td{
+      #resultsData td{
          font-size: 12px;
          background-color: #f2f2f2;
          padding: 7px;
@@ -63,33 +63,7 @@
         background: transparent;
         text-align: center;
       }
-      .hidden {
-       clip: rect(0 0 0 0);
-       clip-path: inset(50%);
-       height: 1px;
-       overflow: hidden;
-       position: absolute;
-       white-space: nowrap;
-       width: 1px;
-       display: none;
-      }
-      .pagination{
-        margin-top: 10px;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-      }
-      .pagination button{
-        border: none;
-        float: left;
-        padding: 8px 16px;
-        background: transparent;
-        transition: background-color .3s;
-      }
-      .pagination button:hover, .pagination button.active{
-        background-color: rgb(37, 164, 248);
-      }
-      #filterTable{
+      #searchInput{
         width: 200px;
         padding: 3px;
         outline: none;
@@ -180,10 +154,11 @@
     Manage Students Result</p>
    <div class="display-result">
     <p id="filterParagraph">Filter results:
-    <input type="text" id="filterTable" placeholder="search for results..."></p>
-      <article class="innerTable">
-      <table id="student-result">
+    <input type="text" id="searchInput" placeholder="search for results..." onkeyup="filterTable()"></p>
+      <table id="resultsData">
+        <thead>
          <tr>
+
          <th>S/N</th>
          <th>ID</th>
          <th>MatricNo</th>
@@ -199,8 +174,11 @@
          <th>Action</th>
          
          </tr>
+         </thead>
+
          <%for(let i = 1; i <= result.length; i++){%>
          <%result.forEach(res => {%>
+          <tbody>
          <tr>
             <td contenteditable="false" data-column="s-n"><%=i++%></td>
             <td contenteditable="false" data-column="id"><%=res.id%></td>
@@ -221,13 +199,19 @@
               </button>
             </td>
          </tr>
+         </tbody>
          <%})%>
          <%}%>
       </table>
-      <!-- Pagination Controls -->
-      <!-- <div class="pagination" id="pagination"></div> -->
-      </article>
+    
+      <div class="pagination">
+        <button id="prevBtn" onclick="prevPage()">Previous</button>
+        <span id="pageNumber"></span>
+        <button id="nextBtn" onclick="nextPage()">Next</button>
+    </div>
+    
    </div>
+
    <div class="footer">
     <footer>
       <p style="font-size: 15px; text-align: center;
@@ -328,151 +312,47 @@ function deleteResult(data){
     }
   })
 }
-//when all documents are fully loaded
-document.addEventListener('DOMContentLoaded', function () {
-  const content = document.querySelector('.innerTable'); 
-  const itemsPerPage = 10;
-  let currentPage = 0;
-  const items = Array.from(content.getElementsByTagName('tr')).slice(1);
 
-  //Show page function
-  function showPage(page) {
-  const startIndex = page * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  items.forEach((item, index) => {
-    item.classList.toggle('hidden', index < startIndex || index >= endIndex);
-  });
-  updateActiveButtonStates();
-  filterResult()
-}
+let currentPage = 1;
+const rowsPerPage = 5;
 
-//Create page buttons function
-function createPageButtons() {
-  const totalPages = Math.ceil(items.length / itemsPerPage);
-  const paginationContainer = document.createElement('div');
-  const paginationDiv = document.body.appendChild(paginationContainer);
-  paginationContainer.classList.add('pagination');
+function paginateTable() {
+    const searchValue = document.getElementById("searchInput").value.toLowerCase();
+    const rows = document.querySelectorAll("#resultsData tbody tr");
 
-for (let i = 0; i < totalPages; i++) {
-const pageButton = document.createElement('button');
-pageButton.classList.add('active');
-pageButton.textContent = i + 1;
-pageButton.addEventListener('click', () => {
-  currentPage = i;
-  showPage(currentPage);
-  updateActiveButtonStates();
-})
-content.appendChild(paginationContainer);
-paginationDiv.appendChild(pageButton);
-}
-filterResult()
-}
-function updateActiveButtonStates() {
-  const pageButtons = document.querySelectorAll('.pagination button');
-  pageButtons.forEach((button, index) => {
-    if (index === currentPage) {
-      button.classList.add('active');
-    } else {
-      button.classList.remove('active');
+    let filteredRows = [...rows].filter(row => row.innerText.toLowerCase().includes(searchValue));
+
+    const totalPages = Math.ceil(filteredRows.length / rowsPerPage) || 1;
+    currentPage = Math.max(1, Math.min(currentPage, totalPages));
+
+    document.getElementById("pageNumber").innerText = `Page ${currentPage} of ${totalPages}`;
+
+    rows.forEach(row => (row.style.display = "none"));
+
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+    filteredRows.slice(startIndex, endIndex).forEach(row => (row.style.display = ""));
+
+    document.getElementById("prevBtn").disabled = currentPage === 1;
+    document.getElementById("nextBtn").disabled = currentPage >= totalPages;
     }
-  })
-  filterResult()
+
+function nextPage() {
+  currentPage++;
+  paginateTable();
 }
-createPageButtons();
-showPage(currentPage);
 
-})
-
-function filterResult(){
-//Get the input field and table
-const filterTable = document.getElementById('filterTable');
-const table = document.getElementById('student-result');
-
-//Add event listener for input change
-filterTable.addEventListener('keyup', function(){
-  //Get the value of the input field
-  const filterValue = filterTable.value.toLowerCase();
-  //Get all rows in the table (excluding the header row)
-  const rows = table.getElementsByTagName("tr");
-
-  //Loop through all table rows
-  for(let i = 1; i < rows.length; i++){
-    const cells = rows[i].getElementsByTagName("td");
-    let rowText = '';
-
-  //Loop through each cell in the row (we can choose which column to filter)
-  for(let j = 0; j < cells.length; j++){
-    rowText += cells[j].innerText.toLowerCase();
-  }
-  if(rowText.indexOf(filterValue) > -1){
-    rows[i].style.display = '';
-  }else{
-    rows[i].style.display = 'none'
-  }
-  }
-})
+function prevPage() {
+  currentPage--;
+  paginateTable();
 }
-filterResult();
 
-// const rowsPerPage = 10; //Rows per page
-// let currentPage = 1;    //Start on page 1
+function filterTable() {
+  currentPage = 1;
+  paginateTable();
+}
 
-// const table = document.getElementById('student-result');
-// const filterInput = document.getElementById('filterTable');
-// const paginationDiv = document.getElementById('pagination');
-
-// function paginateTable(filteredRows){
-//   const rows = filteredRows || Array.from(table.getElementsByTagName('tr')).slice(1);
-//   const totalPages = Math.ceil(rows.length / rowsPerPage);
-//   const startIndex = (currentPage - 1) * rowsPerPage;
-//   const endIndex = startIndex + rowsPerPage;
-
-//   //Hide all rows
-//   rows.forEach(row => row.classList.add('hidden'));
-
-//   //Show rows for the current page
-//   for(let  i = startIndex; i < endIndex && i < rows.length; i++){
-//     rows[i].classList.remove('hidden');
-//   }
-
-//   //Create pagination buttons
-//   createPaginationButtons(totalPages);
-
-// }
-
-//   function createPaginationButtons(totalPages){
-//     paginationDiv.innerHTML = ''; //clear existing buttons
-
-//     for(let i = 1; i <= totalPages; i++){
-//       const button = document.createElement("button");
-//       button.textContent = i;
-//       button.addEventListener('click', ()=>{
-//         currentPage = i;
-//         filterTable(); //Re-filter and update the pagination
-//       });
-//       paginationDiv.appendChild(button);
-//     }
-//   }
-
-//   function filterTable(){
-//     const filter = filterInput.value.toLowerCase();
-//     const rows = Array.from(table.getElementsByTagName('tr')).slice(1); //Skip header row
-//     const filteredRows = rows.filter(row => {
-//       const cells = row.getElementsByTagName('td');
-//       let rowText = '';
-//       for(let cell of cells){
-//         rowText += cell.innerText.toLowerCase();
-//       }
-//       return rowText.includes(filter);
-//     });
-
-//     //Paginate the filtered rows
-//     paginateTable(filteredRows);
-//   }
-// //Initial setup: paginate the full table and filter it
-// filterInput.addEventListener('keyup', filterTable);
-// filterTable();
-//  //Trigger initial filter and pagination
+paginateTable();
 </script>
 </body>
 </html>
