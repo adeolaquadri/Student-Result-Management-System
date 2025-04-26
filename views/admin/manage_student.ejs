@@ -123,16 +123,6 @@
             <a href="/admin/manage_student">Manage student</a>
           </div>
         </div>
-        <!-- Admin section -->
-        <div class="dropdown">
-          <button class="dropbtn">Admin
-            <i class="fa fa-caret-down"></i>
-          </button>
-        <div class="dropdown-content">
-          <a href="/admin/add_admin">Add New Admin</a>
-          <a href="/admin/manage_admin">Manage Admin</a>
-        </div>
-        </div>
       <!-- course section -->
       <div class="dropdown">
           <button class="dropbtn">Course
@@ -211,14 +201,13 @@
    <div class="footer">
     <footer>
       <p style="font-size: 15px; text-align: center;
-      font-style: normal; color: gray;">
-      <span id="cr"></span> &copy;FCAHPTIB.</p>
+      font-style: normal; color: gray;"> &copy; <span id="cr"></span> FCAHPTIB.</p>
       <p style="font-size: 14px; text-align: center;
       font-style: normal; color: gray;">Designed by Adeola Quadri. A</p>
       <p style="font-size: 14px; text-align: center;
       font-style: normal; color: gray;">Supervised by Dr. Mrs Olarenwaju O T.</p>
    </footer>
-      </div>
+    </div>
 
 
 <script>
@@ -278,23 +267,23 @@ document.querySelectorAll('.deletebtn').forEach(button => {
 
 function updateStudent(data){
 fetch('/admin/update_student', {
-  method: 'POST',
+  method: 'PUT',
   headers:{
     'Content-Type': 'application/json',
   },
   body:JSON.stringify(data)
 })
 .then(response => {response.json();
-  if(response.ok){
+  if(response.status === 200){
     alert(`Student with matric number ${data.matric} record updated successfully!`)
   }else{
-    alert("Unable to update student record!")
+    alert('Error updating student record...')
   }
   })
 }
 function deleteStudent(data){
   fetch('/admin/delete_student', {
-    method: 'POST',
+    method: 'DELETE',
     headers:{
       'Content-Type': 'application/json'
     },
@@ -302,11 +291,10 @@ function deleteStudent(data){
   })
   .then(response => {
     response.json();
-    if(response.ok){
-      alert(`student with the matric number ${data.matric} has been deleted!`)
-      window.location.href('/admin/manage_student')
+    if(response.status === 200){
+      alert(`student record with the matric number ${data.matric} has been deleted!`)
     }else{
-      alert('Unable to delete student record')
+      alert('Error deleting student record...')
     }
   })
 }

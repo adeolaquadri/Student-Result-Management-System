@@ -124,16 +124,6 @@
             <a href="/admin/manage_student">Manage student</a>
           </div>
         </div>
-         <!-- Admin section -->
-         <div class="dropdown">
-          <button class="dropbtn">Admin
-            <i class="fa fa-caret-down"></i>
-          </button>
-        <div class="dropdown-content">
-          <a href="/admin/add_admin">Add New Admin</a>
-          <a href="/admin/manage_admin">Manage Admin</a>
-        </div>
-        </div>
       <!-- course section -->
       <div class="dropdown">
           <button class="dropbtn">Course
@@ -208,14 +198,13 @@
    <div class="footer">
     <footer>
       <p style="font-size: 15px; text-align: center;
-      font-style: normal; color: gray;">
-      <span id="cr"></span> &copy;FCAHPTIB.</p>
+      font-style: normal; color: gray;"> &copy; <span id="cr"></span> FCAHPTIB.</p>
       <p style="font-size: 14px; text-align: center;
       font-style: normal; color: gray;">Designed by Adeola Quadri. A</p>
       <p style="font-size: 14px; text-align: center;
       font-style: normal; color: gray;">Supervised by Dr. Mrs Olarenwaju O T.</p>
    </footer>
-      </div>
+    </div>
 
     <script>
       //get full date year and render it in footer section
@@ -274,24 +263,23 @@ document.querySelectorAll('.deletebtn').forEach(button => {
 
 function updateCourse(data){
 fetch('/admin/update_course', {
-  method: 'POST',
+  method: 'PUT',
   headers:{
     'Content-Type': 'application/json',
   },
   body:JSON.stringify(data)
 })
 .then(response => {response.json();
-  if(response.ok){
+  if(response.status === 200){
     alert(`Course updated successfully!`)
-    window.location.href('/admin/manage_course')
   }else{
-    alert("Unable to update course!")
+    alert('Error updating course...')
   }
   })
 }
 function deleteCourse(data){
   fetch('/admin/delete_course', {
-    method: 'POST',
+    method: 'DELETE',
     headers:{
       'Content-Type': 'application/json'
     },
@@ -299,11 +287,10 @@ function deleteCourse(data){
   })
   .then(response => {
     response.json();
-    if(response.ok){
+    if(response.status === 200){
       alert(`Course deleted successfully!`)
-      window.location.href('/admin/manage_course')
     }else{
-      alert('Unable to delete course!')
+      alert('Error deleting course...')
     }
   })
 }

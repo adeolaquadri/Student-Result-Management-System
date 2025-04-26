@@ -91,16 +91,6 @@
             <a href="/admin/manage_student">Manage student</a>
           </div>
         </div>
-           <!-- Admin section -->
-           <div class="dropdown">
-            <button class="dropbtn">Admin
-              <i class="fa fa-caret-down"></i>
-            </button>
-          <div class="dropdown-content">
-            <a href="/admin/add_admin">Add New Admin</a>
-            <a href="/admin/manage_admin">Manage Admin</a>
-          </div>
-          </div>
       <!-- course section -->
       <div class="dropdown">
           <button class="dropbtn">Course
@@ -117,23 +107,22 @@
    <div class="upload">
       <h3>Update Academic Semester</h3>
       <div class="" id="error" style="<%=style%>"><%=message%></div>
-      <form action="/admin/update_semester" method="post" >
+      <form>
          
     <label>Semester:</label><br>
-    <select name="semester" id="" required/>
+    <select name="semester" id="semester" required/>
     <option value="" selected>--select semester</option>
     <option value="First">First</option>
     <option value="Second">Second</option>
 </select><br><br>
 
-        <button type="submit">Update</button>
+        <button type="submit" id="updatebtn">Update</button>
       </form>
    </div>
    <div class="footer">
     <footer>
       <p style="font-size: 15px; text-align: center;
-      font-style: normal; color: gray;">
-      <span id="cr"></span> &copy;FCAHPTIB.</p>
+      font-style: normal; color: gray;"> &copy; <span id="cr"></span> FCAHPTIB.</p>
       <p style="font-size: 14px; text-align: center;
       font-style: normal; color: gray;">Designed by Adeola Quadri. A</p>
       <p style="font-size: 14px; text-align: center;
@@ -158,6 +147,31 @@ const errorMessage = document.getElementById('error')
             errorMessage.style.display = 'none'
         },3000)
     }
+
+
+document.querySelector('#updatebtn').addEventListener('click', ()=>{   
+const semester = document.getElementById("semester").value;
+const data = {
+  semester: semester
+};
+updateSemester(data)
+})
+function updateSemester(data){
+fetch('/admin/update_semester', {
+  method: 'PUT',
+  headers:{
+    'Content-Type': 'application/json',
+  },
+  body:JSON.stringify(data)
+})
+.then(response => {response.json();
+  if(response.status === 200){
+    alert(`Semester updated successfully!`)
+  }else{
+    alert('Error updating semester...')
+  }
+  })
+}
   </script>
 </body>
 </html>
