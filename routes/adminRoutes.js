@@ -50,7 +50,7 @@ router.post('/', async (req, res) => {
     const token = jwt.sign({ username: username }, process.env.admin_secret_key);
 
     res.cookie('admin', token, {
-      maxAge: parseInt(process.env.adminExpiryHour), // make sure this is an integer in ms
+      maxAge: parseInt(process.env.adminExpiryHour),
       httpOnly: true,
       sameSite: true,
     });
@@ -109,7 +109,6 @@ router.get('/dashboard', async (req, res) => {
       query('SELECT * FROM student_result'),
       query('SELECT * FROM admin_table')
     ]);
-    console.log(students)
     res.render('admin/admin', {
       students,
       academic,
@@ -236,56 +235,55 @@ router.get('/upload_result', (req, res)=>{
 
 
 //Post: Admin Upload Student Result
-router.post('/upload_result', upload.single('file'), (req, res) => {
-  const filePath = __dirname + "/uploads/" + req.file.filename;
+router.post('/upload_result', upload.single('file'), async (req, res) => {
+  const filePath = path.join(__dirname, 'uploads', req.file.filename);
 
-  uploadCsv(filePath, req.body)
-    .then(() => {
-      const message = 'Result uploaded Successfully';
-      const style = "font-size: 18px; font-family: calibri; background-color: rgba(37, 164, 248, 0.42); padding: 10px; width: 100%; justify-content: center; border-radius: 5px;";
-      const alert = 'alert alert-info';
+  try {
+    await uploadCsv(filePath, req.body);
+    fs.unlinkSync(filePath); // Cleanup uploaded file
 
-      res.render('admin/upload_result', { message, alert, style });
-    })
-    .catch(err => {
-      console.error('Error uploading CSV:', err);
-      res.status(500).send("Error processing the CSV file.");
-    });
+    const message = 'Result uploaded Successfully';
+    const alert = 'alert alert-info';
+    const style = "font-size: 18px; font-family: calibri; background-color: rgba(37, 164, 248, 0.42); padding: 10px; width: 100%; justify-content: center; border-radius: 5px;";
+    
+    res.render('admin/upload_result', { message, alert, style });
+  } catch (err) {
+    console.error('Error uploading CSV:', err);
+
+    if (fs.existsSync(filePath)) fs.unlinkSync(filePath); // Cleanup on error
+
+    const message = "Error processing the CSV file.";
+    const alert = 'alert alert-danger';
+    const style = "background-color: red; color: white; padding: 10px; font-family: calibri;";
+
+    res.render('admin/upload_result', { message, alert, style });
+  }
 });
 
-function uploadCsv(path, formData) {
+function uploadCsv(filePath, formData) {
   return new Promise((resolve, reject) => {
-    let csvDataColl = [];
-    let stream = fs.createReadStream(path);
-    let fileStream = csv.parse({ headers: false })
-      .on('error', error => reject(error))
-      .on('data', (row) => {
-        csvDataColl.push(row);
-      })
+    const csvData = [];
+
+    fs.createReadStream(filePath)
+      .pipe(csv.parse({ headers: false }))
+      .on('error', reject)
+      .on('data', (row) => csvData.push(row))
       .on('end', () => {
-        // Assume first row is header, replace relevant headers
-        if (csvDataColl.length === 0) return reject(new Error('CSV file is empty'));
+        if (csvData.length === 0) return reject(new Error('CSV file is empty'));
 
-        csvDataColl[0][5] = 'GP';
-        csvDataColl[0][6] = 'CP';
-        csvDataColl[0][7] = 'Session';
-        csvDataColl[0][8] = 'Semester';
-        csvDataColl[0][9] = 'Level';
+        const dataRows = csvData.slice(1); // Remove header
 
-        // Remove header for data processing
-        const dataRows = csvDataColl.slice(1);
+        // Process each row
+        for (let row of dataRows) {
+          const score = parseFloat(row[3]) || 0;
+          const unit = parseFloat(row[4]) || 0;
 
-        // Process each row to add GP, CP, Session, Semester, Level
-        for (let i = 0; i < dataRows.length; i++) {
-          const score = Number(dataRows[i][3]);
-          const courseUnit = Number(dataRows[i][4]);
+          // Add additional fields
+          row[7] = formData.session;
+          row[8] = formData.semester;
+          row[9] = formData.level;
 
-          // Set Session, Semester, Level from form input
-          dataRows[i][7] = formData.session;
-          dataRows[i][8] = formData.semester;
-          dataRows[i][9] = formData.level;
-
-          // Calculate CP based on Score
+          // Calculate CP and GP
           let cp = 0.00;
           if (score >= 75 && score <= 100) cp = 4.00;
           else if (score >= 70) cp = 3.50;
@@ -296,25 +294,26 @@ function uploadCsv(path, formData) {
           else if (score >= 45) cp = 2.25;
           else if (score >= 40) cp = 2.00;
 
-          dataRows[i][6] = cp;
-          dataRows[i][5] = (cp * courseUnit).toFixed(2); // GP = CP * CourseUnit
+          row[6] = cp.toFixed(2);               // CP
+          row[5] = (cp * unit).toFixed(2);      // GP = CP * Unit
         }
 
-        // Now insert all processed rows as batch
+        // Insert into database
         pool.getConnection((err, connection) => {
           if (err) return reject(err);
 
-          const insertQuery = 'INSERT INTO student_result(MatricNo, CourseId, CourseTitle, Score, CourseUnit, GP, CP, Session, Semester, Level) VALUES ?';
+          const insertQuery = `INSERT INTO student_result 
+            (MatricNo, CourseId, CourseTitle, Score, CourseUnit, GP, CP, Session, Semester, Level) 
+            VALUES ?`;
 
           connection.query(insertQuery, [dataRows], (error) => {
             connection.release();
             if (error) return reject(error);
+            console.log("Results uploaded successfully.");
             resolve();
           });
         });
       });
-
-    stream.pipe(fileStream);
   });
 }
 
@@ -328,67 +327,70 @@ router.get('/add_student', (req, res)=>{
 
 
 //POST: Upload student
-router.post('/upload_student', upload.single('file'), (req, res) => {
-  const filePath = __dirname + "/uploads/" + req.file.filename;
+router.post('/upload_student', upload.single('file'), async (req, res) => {
+  const filePath = path.join(__dirname, 'uploads', req.file.filename);
 
-  uploadCsv(filePath)
-    .then(() => {
-      const message = 'Students uploaded Successfully';
-      const style = "font-size: 18px; font-family: calibri; background-color: rgba(37, 164, 248, 0.42); padding: 10px; width: 100%; justify-content: center; border-radius: 5px;";
-      res.render('admin/add_student', { message, style });
-    })
-    .catch(err => {
-      console.error('Error uploading students:', err);
-      res.status(500).send("Error processing the CSV file.");
-    });
+  try {
+    await uploadCsv(filePath);
+
+    // Cleanup file after success
+    fs.unlinkSync(filePath);
+
+    const message = 'Students uploaded Successfully';
+    const style = "font-size: 18px; font-family: calibri; background-color: rgba(37, 164, 248, 0.42); padding: 10px; width: 100%; justify-content: center; border-radius: 5px;";
+    res.render('admin/add_student', { message, style });
+  } catch (err) {
+    console.error('Upload error:', err.message);
+
+    // Cleanup file even on failure
+    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+
+    const message = 'Error uploading students: ' + err.message;
+    const style = "background-color: red; padding: 10px; color: white;";
+    res.render('admin/add_student', { message, style });
+  }
 });
 
-function uploadCsv(path) {
+// CSV Processing Function
+function uploadCsv(filePath) {
   return new Promise((resolve, reject) => {
-    const csvDataColl = [];
-    const stream = fs.createReadStream(path);
-    const fileStream = csv.parse({ headers: false })
-      .on('error', error => reject(error))
-      .on('data', row => {
-        csvDataColl.push(row);
-        // Replace header row labels once
-        if (csvDataColl.length === 1) {
-          csvDataColl[0][10] = 'Passcode';
-          csvDataColl[0][11] = 'Token';
-        }
-      })
-      .on('end', () => {
-        // Remove header row before insertion
-        csvDataColl.shift();
+    const csvData = [];
 
-        // Add Passcode and Token fields to each row
-        for (let i = 0; i < csvDataColl.length; i++) {
-          csvDataColl[i][10] = process.env.defaultPassword || 'defaultpass'; // fallback default password
-          csvDataColl[i][11] = jwt.sign(
-            { matric: csvDataColl[i][0], department: csvDataColl[i][5] },
+    fs.createReadStream(filePath)
+      .pipe(csv.parse({ headers: false }))
+      .on('error', (error) => reject(error))
+      .on('data', (row) => csvData.push(row))
+      .on('end', () => {
+        if (!csvData.length) return reject(new Error('CSV file is empty'));
+
+        // Add Passcode and Token
+        for (let row of csvData) {
+          row[10] = process.env.defaultPassword || 'defaultpass';
+          row[11] = jwt.sign(
+            { matric: row[0], department: row[5] },
             process.env.secret_key,
-            { expiresIn: '30d' } // optional token expiry
+            { expiresIn: '30d' }
           );
         }
 
+        // Insert into database
         pool.getConnection((err, connection) => {
           if (err) return reject(err);
 
-          const query = 'INSERT INTO student(MatricNo, Lastname, Firstname, Middlename, Email, Department, sex, Admission_Year, Level, Programme, Passcode, Token) VALUES ?';
+          const query = `INSERT INTO student 
+            (MatricNo, Lastname, Firstname, Middlename, Email, Department, sex, Admission_Year, Level, Programme, Passcode, Token)
+            VALUES ?`;
 
-          connection.query(query, [csvDataColl], (error) => {
+          connection.query(query, [csvData], (error) => {
             connection.release();
             if (error) return reject(error);
-            console.log("Records added successfully");
+            console.log('CSV import completed successfully.');
             resolve();
           });
         });
       });
-
-    stream.pipe(fileStream);
   });
 }
-
 
 
 //Get: Admin Add Course
@@ -412,8 +414,8 @@ router.get('/manage_course', async(req, res)=>{
 
 
 //Delete: Admin delete course
-router.delete('/delete_course', async (req, res) => {
-    const { courseId, semester, department, level } = req.body;
+router.delete('/delete_course/:id', async (req, res) => {
+    const {id} = req.params;
 
     // Check admin auth
     if (!req.cookies.admin) {
@@ -421,17 +423,13 @@ router.delete('/delete_course', async (req, res) => {
     }
 
     // Validate required fields
-    if (!courseId || !semester || !department || !level) {
+    if (!id) {
         return res.status(400).json({ success: false, message: 'Missing required fields' });
     }
 
-    const query = `
-        DELETE FROM course_table
-        WHERE COURSE_ID = ? AND SEMESTER = ? AND DEPARTMENT = ? AND LEVEL = ?
-    `;
-    const data = [courseId, semester, department, level];
+    const query = 'DELETE FROM course_table WHERE id = ?';
 
-    dbConnection.query(query, data, (err, result) => {
+    dbConnection.query(query, [id], (err, result) => {
         if (err) {
             console.error('Error deleting course:', err);
             return res.status(500).json({ success: false, message: 'Failed to delete course' });
@@ -448,12 +446,13 @@ router.delete('/delete_course', async (req, res) => {
 
 
 //Put: Admin update course
-router.put('/update_course', (req, res) => {
+router.put('/update_course/:id', (req, res) => {
     if (!req.cookies.admin) {
         return res.status(403).json({ success: false, message: 'Unauthorized access' });
     }
 
     const { courseId, courseTitle, courseUnit, semester, department, level } = req.body;
+    const {id} = req.params
 
     if (!courseId || !courseTitle || !courseUnit || !semester || !department || !level) {
         return res.status(400).json({ success: false, message: 'Missing required fields' });
@@ -462,13 +461,10 @@ router.put('/update_course', (req, res) => {
     const updateQuery = `
         UPDATE course_table
         SET COURSE_ID = ?, COURSE_TITLE = ?, COURSE_UNIT = ?, SEMESTER = ?, DEPARTMENT = ?, LEVEL = ?
-        WHERE COURSE_ID = ? AND SEMESTER = ? AND DEPARTMENT = ? AND LEVEL = ?
+        WHERE id = ?
     `;
 
-    const data = [
-        courseId, courseTitle, courseUnit, semester, department, level, // new values
-        courseId, semester, department, level                            // original filter
-    ];
+    const data = [courseId, courseTitle, courseUnit, semester, department, level, id];
 
     dbConnection.query(updateQuery, data, (err, result) => {
         if (err) {
@@ -484,6 +480,14 @@ router.put('/update_course', (req, res) => {
     });
 });
 
+// router.get('/modify', (req, res)=>{
+//   const query = 'ALTER TABLE course_table MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT PRIMARY KEY;';
+//   // `ALTER TABLE course_table ADD COLUMN id INT NULL`
+// dbConnection.query(query, (err, success)=>{
+//   if(err) throw err;
+//   return res.status(200).json({success: success})
+// })
+// })
 
 //Get: Manage Student Result
 router.get('/manage_result', (req, res)=>{
@@ -548,8 +552,7 @@ router.put('/update_student', (req, res) => {
         firstname,
         middlename,
         department,
-        adYear,
-        password,
+        admission,
         level,
         sex
     } = req.body;
@@ -561,11 +564,11 @@ router.put('/update_student', (req, res) => {
     const query = `
         UPDATE student
         SET Email = ?, Lastname = ?, Firstname = ?, Middlename = ?, Department = ?,
-            Admission_Year = ?, Passcode = ?, Level = ?, sex = ?
+            Admission_Year = ?, Level = ?, sex = ?
         WHERE MatricNo = ?
     `;
     
-    const values = [email, lastname, firstname, middlename, department, adYear, password, level, sex, matric];
+    const values = [email, lastname, firstname, middlename, department, admission, level, sex, matric];
 
     dbConnection.query(query, values, (err, result) => {
         if (err) {
@@ -585,17 +588,17 @@ router.put('/update_student', (req, res) => {
 
 
 //Delete: Admin delete result
-router.delete('/delete_result', (req, res) => {
-    const { id } = req.body;
+router.delete('/delete_result/:id', (req, res) => {
+    const { id } = req.params;
 
     // Check for admin cookie
     if (!req.cookies.admin) {
-        return res.status(401).json({ message: 'Unauthorized access' });
+        return res.status(401).json({success:false, message: 'Unauthorized access' });
     }
 
     // Basic validation
     if (!id || isNaN(id)) {
-        return res.status(400).json({ message: 'Invalid or missing result ID' });
+        return res.status(400).json({success:false, message: 'Invalid or missing result ID' });
     }
 
     const query = 'DELETE FROM student_result WHERE id = ?';
@@ -603,51 +606,51 @@ router.delete('/delete_result', (req, res) => {
     dbConnection.query(query, [id], (err, result) => {
         if (err) {
             console.error('Delete result error:', err.message);
-            return res.status(500).json({ message: 'Server error while deleting result' });
+            return res.status(500).json({success:false, message: 'Server error while deleting result' });
         }
 
         // Check if any row was deleted
         if (result.affectedRows === 0) {
-            return res.status(404).json({ message: 'Result not found' });
+            return res.status(404).json({success:false, message: 'Result not found' });
         }
 
-        return res.status(200).json({ message: 'Result deleted successfully' });
+        return res.status(200).json({success:true, message: 'Result deleted successfully' });
     });
 });
 
 
 
 //Put: Admin Update Result
-router.put('/update_result', (req, res) => {
+router.put('/update_result/:id', (req, res) => {
   if (!req.cookies.admin) {
-    return res.status(401).json({ message: 'Unauthorized access' });
+    return res.status(401).json({success:false, message: 'Unauthorized access' });
   }
-
-  let { id, matric, session, semester, level, courseId, courseTitle, courseUnit, score, cp, gp } = req.body;
+  let {id} = req.params;
+  let {session, semester, level, courseId, courseTitle, courseUnit, score, cp, gp } = req.body;
 
   // Basic validation
   if (!id || isNaN(id)) {
-    return res.status(400).json({ message: 'Invalid or missing result ID' });
+    return res.status(400).json({success:false, message: 'Invalid or missing result ID' });
   }
 
   const updateQuery = `
     UPDATE student_result
-    SET MatricNo = ?, Session = ?, Semester = ?, Level = ?, CourseId = ?, CourseTitle = ?, CourseUnit = ?, Score = ?, CP = ?, GP = ?
+    SET  Session = ?, Semester = ?, Level = ?, CourseId = ?, CourseTitle = ?, CourseUnit = ?, Score = ?, CP = ?, GP = ?
     WHERE id = ?
   `;
-  const data = [matric, session, semester, level, courseId, courseTitle, courseUnit, score, cp, gp, id];
+  const data = [session, semester, level, courseId, courseTitle, courseUnit, score, cp, gp, id];
 
   dbConnection.query(updateQuery, data, (err, result) => {
     if (err) {
       console.error('Update result error:', err.message);
-      return res.status(500).json({ message: 'Error updating result' });
+      return res.status(500).json({success:false, message: 'Error updating result' });
     }
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({ message: 'Result not found' });
+      return res.status(404).json({success:false, message: 'Result not found' });
     }
 
-    return res.status(200).json({ message: 'Result updated successfully' });
+    return res.status(200).json({success:true, message: 'Result updated successfully' });
   });
 });
 
@@ -780,71 +783,84 @@ router.put('/reset-password', async (req, res) => {
 
 //Post: Admin upload Courses
 router.post('/upload_courses', upload.single('file'), (req, res) => {
-    if (!req.cookies.admin) return res.redirect('/admin');
+  if (!req.cookies.admin) return res.redirect('/admin');
 
-    const filePath = path.join(__dirname, 'uploads', req.file.filename);
+  const filePath = path.join(__dirname, 'uploads', req.file.filename);
 
-    function uploadCsv(path) {
-        const stream = fs.createReadStream(path);
-        let csvDataColl = [];
+  uploadCoursesCsv(filePath)
+    .then(result => {
+      fs.unlinkSync(filePath); // ✅ Clean up file
+      const message = result === 'no_new'
+        ? 'No new courses to upload. All entries already exist.'
+        : 'Courses uploaded successfully';
 
-        const fileStream = csv.parse()
-            .on('data', (data) => {
-                csvDataColl.push(data);
-            })
-            .on('end', () => {
-                csvDataColl.shift(); // remove header row
+      const style = result === 'no_new'
+        ? "font-size: 18px; font-family: calibri; background-color: #f8d7da; padding: 10px; border-radius: 5px;"
+        : "font-size: 18px; font-family: calibri; background-color: rgba(37, 164, 248, 0.42); padding: 10px; border-radius: 5px;";
 
-                pool.getConnection((err, connection) => {
-                    if (err) {
-                        fs.unlinkSync(filePath);
-                        return res.status(500).send(err.message);
-                    }
+      res.render('admin/add_course', { message, style });
+    })
+    .catch(err => {
+      console.error('Course upload error:', err);
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath); // ✅ Clean up on error
+      res.status(500).send('Failed to upload course data.');
+    });
+});
 
-                    // Check and insert only new courses
-                    const checkQuery = `SELECT COURSE_ID, SEMESTER, DEPARTMENT, LEVEL FROM course_table`;
-                    connection.query(checkQuery, (err, existingCourses) => {
-                        if (err) {
-                            fs.unlinkSync(filePath);
-                            return res.status(500).send('Error checking existing courses');
-                        }
+function uploadCoursesCsv(filePath) {
+  return new Promise((resolve, reject) => {
+    const csvData = [];
 
-                        const existingSet = new Set(
-                            existingCourses.map(row => `${row.COURSE_ID}-${row.SEMESTER}-${row.DEPARTMENT}-${row.LEVEL}`)
-                        );
+    fs.createReadStream(filePath)
+      .pipe(csv.parse())
+      .on('error', reject)
+      .on('data', row => csvData.push(row))
+      .on('end', () => {
+        if (csvData.length < 2) return resolve('no_new'); // Empty or only header
 
-                        const newCourses = csvDataColl.filter(row => {
-                            const key = `${row[0]}-${row[3]}-${row[4]}-${row[5]}`;
-                            return !existingSet.has(key);
-                        });
+        const dataRows = csvData.slice(1); // Remove header row
 
-                        if (newCourses.length === 0) {
-                            fs.unlinkSync(filePath);
-                            return res.render('admin/add_course', {
-                                message: 'No new courses to upload. All entries already exist.',
-                                style: "font-size: 18px; font-family: calibri; background-color: #f8d7da; padding: 10px; border-radius: 5px;"
-                            });
-                        }
+        pool.getConnection((err, connection) => {
+          if (err) return reject(err);
 
-                        const insertQuery = `INSERT INTO course_table(COURSE_ID, COURSE_TITLE, COURSE_UNIT, SEMESTER, DEPARTMENT, LEVEL) VALUES ?`;
-                        connection.query(insertQuery, [newCourses], (err) => {
-                            fs.unlinkSync(filePath); // 🧹 Clean up
-                            if (err) return res.status(500).send('Error uploading new courses');
+          const existingQuery = `SELECT COURSE_ID, SEMESTER, DEPARTMENT, LEVEL FROM course_table`;
+          connection.query(existingQuery, (err, existingCourses) => {
+            if (err) {
+              connection.release();
+              return reject(err);
+            }
 
-                            return res.render('admin/add_course', {
-                                message: 'Courses uploaded successfully',
-                                style: "font-size: 18px; font-family: calibri; background-color: rgba(37, 164, 248, 0.42); padding: 10px; border-radius: 5px;"
-                            });
-                        });
-                    });
-                });
+            const existingSet = new Set(
+              existingCourses.map(c => `${c.COURSE_ID}-${c.SEMESTER}-${c.DEPARTMENT}-${c.LEVEL}`)
+            );
+
+            const newCourses = dataRows.filter(row => {
+              const key = `${row[0]}-${row[3]}-${row[4]}-${row[5]}`;
+              return !existingSet.has(key);
             });
 
-        stream.pipe(fileStream);
-    }
+            if (newCourses.length === 0) {
+              connection.release();
+              return resolve('no_new');
+            }
 
-    uploadCsv(filePath);
-});
+            const insertQuery = `
+              INSERT INTO course_table
+              (COURSE_ID, COURSE_TITLE, COURSE_UNIT, SEMESTER, DEPARTMENT, LEVEL)
+              VALUES ?
+            `;
+
+            connection.query(insertQuery, [newCourses], err => {
+              connection.release();
+              if (err) return reject(err);
+              resolve('success');
+            });
+          });
+        });
+      });
+  });
+}
+
 
 
 

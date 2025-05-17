@@ -1,132 +1,208 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-   <meta charset="UTF-8">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="page icon" type="icon" href="/fcahptib.png">
-    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"> -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" 
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/style2.css">
-   <title>Add Course</title>
-   <style>
-      .add-student{
-         height: fit-content;
-         width: fit-content;
-         background: #ffffff;
-         margin: auto;
-         margin-top: 10px;
-         padding: 15px;
-         display: flex;
-         flex-direction: column;
-         margin-top: 50px;
-      }
-      .add-student h3{
-         text-align: left;
-         font-size: 18px;
-         font-family: calibri;
-         border-bottom: 1px solid #ccc;
-      }
-      .add-student p{
-        font-size: 13px;
-      }
-      .add-student form button{
-         border: none;
-         width: 100%;
-         padding: 10px;
-         font-size: 12pt;
-         cursor: pointer;
-         background-color: rgb(37, 164, 248);
-         color: #fff;
-      }
-      .add-student input{
-            outline: none;
-            font-size: 16px;
-            font-family: Calibri;
-            width: 300px;
-            height: 30px;
-        }
-        select{
-            width: 310px;
-            height: 35px;
-        }
-   </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Upload Course</title>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+  />
+  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="icon" type="image/png" href="/fcahptib.png" />
 </head>
 <body>
-   <!-- header section -->
-   <div class="header">
-    <center><img src="/fcahptib.png" alt="" height="50"></center>
-    <h3 style="color: white; font-family: calibri; text-align: center;">
-        Administrator Section</h3>
+  <!-- header -->
+  <header class="header" role="banner">
+    <img src="/fcahptib.png" alt="FCAHPTIB Logo" height="50" />
+    <h3 style="font-family: calibri;">Administrator Section</h3>
+  </header>
+
+  <!-- Hamburger menu toggle for mobile -->
+  <button
+    id="menu-toggle"
+    aria-label="Toggle navigation menu"
+    aria-expanded="false"
+    aria-controls="menu-bar"
+  >
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  <!-- menu bar -->
+  <nav
+    class="menu-bar"
+    id="menu-bar"
+    role="navigation"
+    aria-label="Admin navigation menu"
+  >
+    <a href="/admin/dashboard" tabindex="0">Dashboard</a>
+
+    <!-- Academic Session -->
+    <div
+      class="dropdown"
+      tabindex="0"
+      aria-haspopup="true"
+      aria-expanded="false"
+      aria-label="Session menu"
+    >
+      <button
+        class="dropbtn"
+        aria-haspopup="true"
+        aria-expanded="false"
+        aria-controls="session-menu"
+      >
+        Session <i class="fa fa-caret-down" aria-hidden="true"></i>
+</button>
+<div class="dropdown-content" id="session-menu" role="menu">
+<a href="/admin/add_session" role="menuitem" tabindex="-1" >Add session</a >
+<a href="/admin/manage_session" role="menuitem" tabindex="-1" >Manage session</a >
+</div>
+</div>
+<!-- Semester -->
+<div
+  class="dropdown"
+  tabindex="0"
+  aria-haspopup="true"
+  aria-expanded="false"
+  aria-label="Semester menu"
+>
+  <button
+    class="dropbtn"
+    aria-haspopup="true"
+    aria-expanded="false"
+    aria-controls="semester-menu"
+  >
+    Semester <i class="fa fa-caret-down" aria-hidden="true"></i>
+  </button>
+  <div class="dropdown-content" id="semester-menu" role="menu">
+    <a href="/admin/add_semester" role="menuitem" tabindex="-1"
+      >Add semester</a
+    >
+    <a href="/admin/manage_semester" role="menuitem" tabindex="-1"
+      >Manage semester</a
+    >
+  </div>
 </div>
 
-  <!-- menu-bar section -->
-  <div class="menu-bar">
-      <a href="/admin/dashboard">Dashboard</a>
-      <!-- Academic Session -->
-      <div class="dropdown">
-         <button class="dropbtn">Session
-           <i class="fa fa-caret-down"></i>
-         </button>
-         <div class="dropdown-content">
-           <a href="/admin/update_session">Update academic session</a>
-         </div>
-       </div>  
-       <!-- Academic Semester -->
-       <div class="dropdown">
-         <button class="dropbtn">Semester
-           <i class="fa fa-caret-down"></i>
-         </button>
-         <div class="dropdown-content">
-           <a href="/admin/update_semester">Update academic semester</a>
-         </div>
-       </div> 
-      <!-- result section -->
-      <div class="dropdown">
-          <button class="dropbtn">Result
-            <i class="fa fa-caret-down"></i>
-          </button>
-          <div class="dropdown-content">
-            <a href="/admin/upload_result">Upload result</a>
-            <a href="/admin/manage_result">Manage result</a>
-          </div>
-        </div>        
-
-        <!-- student section -->
-        <div class="dropdown">
-          <button class="dropbtn">Student
-            <i class="fa fa-caret-down"></i>
-          </button>
-          <div class="dropdown-content">
-            <a href="/admin/add_student">Add student</a>
-            <a href="/admin/manage_student">Manage student</a>
-          </div>
-        </div>
-      <!-- course section -->
-      <div class="dropdown">
-          <button class="dropbtn">Course
-            <i class="fa fa-caret-down"></i>
-          </button>
-          <div class="dropdown-content">
-            <a href="/admin/add_course">Add course</a>
-            <a href="/admin/manage_course">Manage courses</a>
-          </div>
-        </div>
-      <a href="/admin/logout" id="logout">Logout</a>
-      <a href="/admin/change_password">Change Password</a>
+<!-- Result -->
+<div
+  class="dropdown"
+  tabindex="0"
+  aria-haspopup="true"
+  aria-expanded="false"
+  aria-label="Result menu"
+>
+  <button
+    class="dropbtn"
+    aria-haspopup="true"
+    aria-expanded="false"
+    aria-controls="result-menu"
+  >
+    Result <i class="fa fa-caret-down" aria-hidden="true"></i>
+  </button>
+  <div class="dropdown-content" id="result-menu" role="menu">
+    <a href="/admin/upload_result" role="menuitem" tabindex="-1">Add result</a>
+    <a
+      href="/admin/manage_result"
+      role="menuitem"
+      tabindex="-1"
+      >Manage results</a
+    >
   </div>
-   <div class="add-student">
-      <h3>Add Courses</h3><br>
-      <div style="<%=style%>" id="message"><%=message%></div>
-      <form action="/admin/upload_courses" method="post" enctype="multipart/form-data">
-        <label>Choose file to upload:</label><br>
-        <input type="file" name="file" accept="csv" required/><br><br>
-        <p><b>NB:</b>The file must be in excel file (.csv) <br> and contains header [courseId, courseTitle, 
-          courseUnit, Semester, Department, Level accordingly]</p><br>
-       <button type="submit">Upload Courses</button>
-     </form>
-   </div>
+</div>
+
+<!-- Student -->
+<div
+  class="dropdown"
+  tabindex="0"
+  aria-haspopup="true"
+  aria-expanded="false"
+  aria-label="Student menu"
+>
+  <button
+    class="dropbtn"
+    aria-haspopup="true"
+    aria-expanded="false"
+    aria-controls="student-menu"
+  >
+    Student <i class="fa fa-caret-down" aria-hidden="true"></i>
+  </button>
+  <div class="dropdown-content" id="student-menu" role="menu">
+    <a href="/admin/add_student" role="menuitem" tabindex="-1"
+      >Add student</a
+    >
+    <a href="/admin/manage_student" role="menuitem" tabindex="-1"
+      >Manage student</a
+    >
+  </div>
+</div>
+
+<!-- Course -->
+<div
+  class="dropdown"
+  tabindex="0"
+  aria-haspopup="true"
+  aria-expanded="false"
+  aria-label="Course menu"
+>
+  <button
+    class="dropbtn"
+    aria-haspopup="true"
+    aria-expanded="false"
+    aria-controls="course-menu"
+  >
+    Course <i class="fa fa-caret-down" aria-hidden="true"></i>
+  </button>
+  <div class="dropdown-content" id="course-menu" role="menu">
+    <a href="/admin/add_course" role="menuitem" tabindex="-1">Add course</a>
+    <a
+      href="/admin/manage_course"
+      role="menuitem"
+      tabindex="-1"
+      >Manage courses</a
+    >
+  </div>
+</div>
+
+<a href="/admin/change_password" tabindex="0">Change Password</a>
+<button
+  id="logout-btn"
+  class="dropbtn"
+  aria-label="Logout"
+  style="
+    margin-left: auto;
+    background: #a73232;
+    border: none;
+    font-weight: 700;
+    color: #fff;
+  "
+>
+  <i class="fa fa-sign-out"></i> Logout
+</button>
+</nav>
+   <div class="add-courses-form">
+  <h3>Add Courses</h3>
+
+  <div class="message" id="message"><%=message%></div>
+
+  <form action="/admin/upload_courses" method="POST" enctype="multipart/form-data">
+    <label for="courseFile">Choose file to upload:</label>
+    <input type="file" id="courseFile" name="file" accept=".csv" required />
+
+    <p class="note">
+      <strong>Note:</strong> The file must be a <strong>.csv</strong> file with the following headers:
+      <br />
+      <code>
+        courseId, courseTitle, courseUnit, Semester, Department, Level
+      </code>
+    </p>
+
+    <button type="submit" class="submit-btn">Upload Courses</button>
+  </form>
+</div>
+
    <!-- footer section -->
    <div class="footer">
     <footer>
