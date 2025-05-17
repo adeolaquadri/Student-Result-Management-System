@@ -1,161 +1,305 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Result</title>
-    <link rel="page icon" type="icon" href="/fcahptib.png">
-    <link rel="stylesheet" href="/style.css">
-    <link rel="stylesheet" 
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <script src="/jquery-3.7.1.min.js"></script>
-    <script src="/index.js"></script>
-<style>
-    table{
-        width: 100%;
-        border-collapse: collapse;
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Student Result</title>
+  <link rel="icon" href="/fcahptib.png" type="image/png" />
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    rel="stylesheet"
+  />
+  <link
+    href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+
+  <style>
+    /* Reset */
+    *, *::before, *::after {
+      box-sizing: border-box;
     }
-    td{
-        text-align: center;
-        font-family: calibri;
-        font-size: 14px;
+    body, html {
+      margin: 0; padding: 0; height: 100%;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #fafafa;
+      color: #333;
     }
-    td button a{
-        font-size: 12px;
+
+    /* Layout Grid: header, sidebar, main content, footer */
+    body {
+      display: grid;
+      grid-template-areas:
+        "header header"
+        "sidebar main"
+        "footer footer";
+      grid-template-columns: 220px 1fr;
+      grid-template-rows: 60px 1fr 40px;
+      min-height: 100vh;
     }
-    th, td{
-        border-bottom: 1px solid gainsboro
+
+    header.header {
+      grid-area: header;
+      background: #a73232;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1rem;
+      color: white;
     }
-    .resultbtn{
-        border: none;
-        cursor: pointer;
-        background-color: rgb(37, 164, 248);
-        padding: 8px;
-        font-size: 14px;
-        font-family: calibri;
-        border-radius: 2px;
+    header.header img {
+      height: 40px;
     }
-</style>
+    header.header .menu-toggle {
+      font-size: 24px;
+      cursor: pointer;
+      display: none; /* hide on desktop */
+    }
+
+    aside.sidebar {
+      grid-area: sidebar;
+      background: #7f2525;
+      color: white;
+      padding: 1rem 0;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s ease;
+    }
+    aside.sidebar.hidden {
+      transform: translateX(-100%);
+    }
+
+    aside.sidebar p.user-info {
+      margin: 0 1rem 1.5rem;
+      font-size: 1rem;
+      text-align: center;
+      text-transform: capitalize;
+    }
+    aside.sidebar p.user-info i {
+      margin-right: 0.5rem;
+    }
+    aside.sidebar a {
+      display: block;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      text-decoration: none;
+      transition: background-color 0.3s ease;
+      margin: 0.5rem 1rem;
+      border-radius: 4px;
+    }
+    aside.sidebar a:hover,
+    aside.sidebar a.active {
+      background-color: #a73232;
+    }
+
+    main.main-content {
+      grid-area: main;
+      padding: 1rem 2rem;
+      background: white;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Table styling */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.5rem;
+      font-size: 1rem;
+    }
+    th, td {
+      border-bottom: 1px solid #ddd;
+      padding: 0.75rem 1rem;
+      text-align: center;
+    }
+    th {
+      background-color: #f7f7f7;
+      font-weight: 600;
+    }
+    td:first-child {
+      text-align: left;
+    }
+    .resultbtn {
+      border: none;
+      cursor: pointer;
+      background-color: #a73232;
+      padding: 6px 12px;
+      font-size: 14px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      border-radius: 4px;
+      color: white;
+      transition: background-color 0.3s ease;
+    }
+    .resultbtn:hover {
+      background-color: #7f2525;
+    }
+    .resultbtn a {
+      color: white;
+      text-decoration: none;
+    }
+
+    footer.footer {
+      grid-area: footer;
+      /* background: #f0f0f0; */
+      color: #666;
+      font-size: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.5rem 1rem;
+      user-select: none;
+    }
+
+    /* Responsive */
+
+    @media (max-width: 768px) {
+      body {
+        grid-template-areas:
+          "header"
+          "main"
+          "footer";
+        grid-template-columns: 1fr;
+        grid-template-rows: 60px 1fr 40px;
+      }
+      aside.sidebar {
+        position: fixed;
+        top: 60px;
+        left: 0;
+        height: calc(100% - 60px);
+        width: 220px;
+        z-index: 1000;
+        transform: translateX(-100%);
+        box-shadow: 2px 0 5px rgba(0,0,0,0.3);
+      }
+      aside.sidebar.show {
+        transform: translateX(0);
+        background: #7f2525;
+      }
+      header.header .menu-toggle {
+        display: block;
+      }
+      main.main-content {
+        padding: 1rem;
+      }
+    }
+  </style>
 </head>
 <body>
+  <header class="header">
+    <img src="fcahptib.png" alt="FCAHPTIB Logo" />
+    <button aria-label="Toggle menu" class="menu-toggle" id="menuToggle">
+      <i class="fa fa-bars"></i>
+    </button>
+  </header>
 
-    <!-- header -->
-    <div class="header">
-        <img src="fcahptib.png" alt="" height="50">
-        <a href="javascript:void(0);" class="icon" onclick="myFunction()">
-            <i class="fa fa-bars" style="font-size: 20px; color: #fff;
-             align-self: center;"></i>
-          </a>    
-    </div>
-    <div class="sidebar" id="sideBar" style="width: 180px;">
-        <p style="font-family: calibri; font-size: 16px; text-align: center;">
-            <i class="fa fa-fw fa-location"></i><%=fullname%></p><br>
-            <p style="font-family: calibri; font-size: 16px; text-align: center;
-        color: rgb(71, 71, 71); display: block;">
-        <i class="fa fa-fw fa-map-marker" style="font-size: 20px;"></i><%=department%></p><br><br>
+  <aside class="sidebar" id="sidebar" aria-label="Sidebar Navigation">
+    <p class="user-info">
+      <i class="fa fa-fw fa-user"></i> <%= fullname %>
+    </p>
+    <p class="user-info" style="color: #ddd;">
+      <i class="fa fa-fw fa-map-marker"></i> <%= department %>
+    </p>
 
-            <a href="/dashboard" class="active"><i class="fa fa-fw fa-dashboard"></i>Dashboard</a><br><br><br>
-            <a href="/profile" id="profile"><i class="fa fa-fw fa-user"></i>Profile</a><br><br><br>
-            <a href="/course_registration"><i class="fa fa-fw fa-book"></i>Course Registration</a><br><br><br>
-            <a href="RePrint_Course_Form"><i class="fa fa-fw fa-book"></i>Reprint course form</a><br><br><br>
-            <a href="/result"><i class="fa fa-fw fa-table"></i>My Result</a><br><br><br>
-            <a href="/change_password"><i class="fa fa-fw fa-lock"></i>Change Password</a><br><br><br>
-            <a href="/logout" id="logout"><i class="fa fa-fw fa-sign-out"></i>Logout</a><br><br><br>
-    </div>
+    <nav>
+      <a href="/dashboard">
+        <i class="fa fa-fw fa-dashboard"></i> Dashboard
+      </a>
+      <a href="/profile" id="profile">
+        <i class="fa fa-fw fa-user"></i> Profile
+      </a>
+      <a href="/course_registration">
+        <i class="fa fa-fw fa-book"></i> Course Registration
+      </a>
+      <a href="RePrint_Course_Form">
+        <i class="fa fa-fw fa-book"></i> Reprint Course Form
+      </a>
+      <a href="/result" class="active">
+        <i class="fa fa-fw fa-table"></i> My Result
+      </a>
+      <a href="/change_password">
+        <i class="fa fa-fw fa-lock"></i> Change Password
+      </a>
+      <a href="/logout" id="logout">
+        <i class="fa fa-fw fa-sign-out"></i> Logout
+      </a>
+    </nav>
+  </aside>
 
-    <!-- main content section -->
-    <div class="main-content" id="mainContent">
-       <div class="document">
-        <p style="background-color: rgb(167, 50, 50);;"><%=fullname%> RESULT</p>
-        <table>
-            <tr>
-                <td>Student Name:</td><td><%=fullname%></td>
-            </tr>
-            <tr>
-                <td>Matriculation Number:</td><td><%=matric %></td>
-            </tr>
-            <tr>
-                <td>Course of Study:</td><td><%=department %></td>
-            </tr>
-            <tr>
-                <td>Current Level:</td><td><%=level %></td>
-            </tr>
-        </table>
-       </div>
-    
-       <div class="document">
-        <p>RESULT</p>
-        <table style="height: fit-content; background-color: white;">
-            <tr>
-                <th>Session</th>
-                <th>GPA</th>
-                <th>Action</th>
-            </tr>
-            <%reg.forEach(regs => { %>
-                <tr>
-                    <td><%=regs.Session%>/<%=regs.Session + 1%></td>
-                    <%gp.forEach(res => { %>
-                        <%if(regs.Session == res.Session || reg.includes(res.Session[1]) == true){%>
-                    <td><%=res.mygp.toFixed(2)%></td>
-                    <td><button class="resultbtn">
-                        <a href="/view_result?id=<%=matric%>&session=<%=regs.Session%>&gp=<%=res.mygp.toFixed(2)%>">View/Print</a>
-                    </button></td>
-                        <%}else{%>
-                            <%}%>
-                    <%})%>
-                </tr>
-                <%})%>
+  <main class="main-content" id="mainContent" role="main" tabindex="-1">
+    <h1 style="margin-bottom: 1rem; color: #a73232; text-transform: uppercase;">
+      <%= fullname %> Result
+    </h1>
 
-                    <tr>
-                        <%if(reg.length == 1){%>
-                        <td style="font-size: 16px; font-weight: bold;">CGPA:</td>
-                        <td><%=gp[0].mygp.toFixed(2)%></td>
-                        <td></td>
-                        <%}else{%>
-                        <td style="font-size: 16px; font-weight: bold;">CGPA:</td>
-                        <td><%=cgpa.toFixed(2)%></td>
-                        <td></td>
-                <%}%>
-            </tr>
-        </table>
-       </div>                           
+    <table>
+      <tbody>
+        <tr>
+          <td><strong>Student Name:</strong></td><td><%= fullname %></td>
+        </tr>
+        <tr>
+          <td><strong>Matriculation Number:</strong></td><td><%= matric %></td>
+        </tr>
+        <tr>
+          <td><strong>Course of Study:</strong></td><td><%= department %></td>
+        </tr>
+        <tr>
+          <td><strong>Current Level:</strong></td><td><%= level %></td>
+        </tr>
+      </tbody>
+    </table>
 
-    <!-- footer section -->
-    <footer>
-        <p style="font-size: 14px; text-align: center;
-        font-style: normal; font-family: sans-serif; color: gray;">
-        <span id="cr"></span> &copy;FCAHPTIB.</p>
-        <p style="font-size: 14px; text-align: center;
-        font-style: normal; font-family: sans-serif; color: gray;">Designed by Adeola Quadri. A</p>
-        <p style="font-size: 14px; text-align: center;
-        font-style: normal; font-family: sans-serif; color: gray;">Supervised by Dr. Mrs Olarenwaju O T.</p>
-     </footer>
-    </div>
-        <!-- javascript code section -->
-        <script>
-            document.querySelector('#logout').addEventListener('click', (e)=>{
-   if(confirm('Are sure you want to logout?') == true){
-       fetch('/logout',{
-       method: 'get'})
-   }else{
-       e.preventDefault()
-   }
-   
-})
-let date = new Date()
-document.getElementById('cr').innerHTML = date.getFullYear();
+    <table>
+      <thead>
+        <tr>
+          <th>Session</th>
+          <th>GPA</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+  <% if (reg.length === 0) { %>
+    <tr>
+      <td colspan="3" style="color: red; font-weight: bold; text-align: center;">
+        No results found.
+      </td>
+    </tr>
+  <% } else { %>
+    <% reg.forEach(regs => { 
+         const matchedGp = gp.find(res => res.Session === regs.Session);
+    %>
+      <tr>
+        <td><%= regs.Session %> / <%= regs.Session + 1 %></td>
+        <td>
+          <% if (matchedGp) { %>
+            <%= matchedGp.mygp.toFixed(2) %>
+          <% } else { %>
+            N/A
+          <% } %>
+        </td>
+        <td>
+          <% if (matchedGp) { %>
+            <button class="resultbtn">
+              <a href="/view_result?id=<%= matric %>&session=<%= regs.Session %>&gp=<%= matchedGp.mygp.toFixed(2) %>">View Result</a>
+            </button>
+          <% } %>
+        </td>
+      </tr>
+    <% }) %>
+  <% } %>
+</tbody>
 
-function myFunction() {
-var x = document.getElementById("sideBar");
-if (x.style.display === "block") {
-x.style.display = "none";
-document.getElementById("mainContent").style.marginLeft = "0";
-} else {
-x.style.display = "block";
-document.getElementById("mainContent").style.marginLeft = "180px";
+</table>
 
-}
-}
-        </script>
-</body>
-</html>
+</main> 
+<footer class="footer">
+       <div>&copy; <%= new Date().getFullYear() %> FCAHPTIB.</div>
+  <div>Designed by Adeola Quadri. A</div>
+  <div>Supervised Dr. Mrs Olarenwaju O T.</div>
+      </footer>
+       <script> 
+       const menuToggle = document.getElementById('menuToggle'); const sidebar = document.getElementById('sidebar'); menuToggle.addEventListener('click', () => { sidebar.classList.toggle('show'); });
+ </script> 
+ </body> </html>

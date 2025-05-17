@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-   <meta charset="UTF-8">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <link rel="page icon" type="icon" href="/fcahptib.png">
+   <meta charset="UTF-8" />
+   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+   <link rel="page icon" type="icon" href="/fcahptib.png" />
    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"> -->
    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-   <link rel="stylesheet" 
-   href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/style2.css">
+   <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+   />
+   <link rel="stylesheet" href="/style2.css" />
    <title>Update Academic Semester</title>
    <style>
-      .upload{
+      .upload {
          height: 350px;
          width: 400px;
          background: #ffffff;
@@ -20,14 +22,14 @@
          padding: 10px;
          display: flex;
          flex-direction: column;
-         justify-content:space-between
+         justify-content: space-between;
       }
-      .upload h3{
+      .upload h3 {
          text-align: left;
          font-size: 18px;
          font-family: calibri;
       }
-      .upload form button{
+      .upload form button {
          border: none;
          width: 100%;
          padding: 10px;
@@ -36,142 +38,181 @@
          background-color: rgb(37, 164, 248);
          color: #fff;
       }
-      .upload form input{
+      .upload form input {
          width: 100%;
-
       }
    </style>
 </head>
 <body>
-  <div class="header">
-    <center><img src="/fcahptib.png" alt="" height="50"></center>
-    <h3 style="color: white; font-family: calibri; text-align: center;">
-        Administrator Section</h3>
-</div>
+   <div class="header">
+      <center><img src="/fcahptib.png" alt="" height="50" /></center>
+      <h3 style="color: white; font-family: calibri; text-align: center;">
+         Administrator Section
+      </h3>
+   </div>
    <!-- menu bar -->
    <div class="menu-bar">
       <a href="/admin/dashboard">Dashboard</a>
-      
-    <!-- Academic Session -->
+
+      <!-- Academic Session -->
       <div class="dropdown">
-        <button class="dropbtn">Session
-          <i class="fa fa-caret-down"></i>
-        </button>
-        <div class="dropdown-content">
-          <a href="/admin/update_session">Update academic session</a>
-        </div>
-      </div> 
-      <!-- Academic Semester -->
-      <div class="dropdown">
-         <button class="dropbtn">Semester
-           <i class="fa fa-caret-down"></i>
+         <button class="dropbtn">
+            Session
+            <i class="fa fa-caret-down"></i>
          </button>
          <div class="dropdown-content">
-           <a href="/admin/update_semester">Update academic semester</a>
+            <a href="/admin/update_session">Update academic session</a>
          </div>
-       </div> 
-         <!-- result section -->
+      </div>
+      <!-- Academic Semester -->
       <div class="dropdown">
-          <button class="dropbtn">Result
+         <button class="dropbtn">
+            Semester
             <i class="fa fa-caret-down"></i>
-          </button>
-          <div class="dropdown-content">
+         </button>
+         <div class="dropdown-content">
+            <a href="/admin/update_semester">Update academic semester</a>
+         </div>
+      </div>
+      <!-- result section -->
+      <div class="dropdown">
+         <button class="dropbtn">
+            Result
+            <i class="fa fa-caret-down"></i>
+         </button>
+         <div class="dropdown-content">
             <a href="/admin/upload_result">Upload result</a>
             <a href="/admin/manage_result">Manage result</a>
-          </div>
-        </div>        
+         </div>
+      </div>
 
-        <!-- student section -->
-        <div class="dropdown">
-          <button class="dropbtn">Student
+      <!-- student section -->
+      <div class="dropdown">
+         <button class="dropbtn">
+            Student
             <i class="fa fa-caret-down"></i>
-          </button>
-          <div class="dropdown-content">
+         </button>
+         <div class="dropdown-content">
             <a href="/admin/add_student">Add student</a>
             <a href="/admin/manage_student">Manage student</a>
-          </div>
-        </div>
+         </div>
+      </div>
       <!-- course section -->
       <div class="dropdown">
-          <button class="dropbtn">Course
+         <button class="dropbtn">
+            Course
             <i class="fa fa-caret-down"></i>
-          </button>
-          <div class="dropdown-content">
+         </button>
+         <div class="dropdown-content">
             <a href="/admin/add_course">Add course</a>
             <a href="/admin/manage_course">Manage courses</a>
-          </div>
-        </div>
+         </div>
+      </div>
       <a href="/admin/logout" id="logout">Logout</a>
       <a href="/admin/change_password">Change Password</a>
-  </div>
+   </div>
    <div class="upload">
       <h3>Update Academic Semester</h3>
       <div class="" id="error" style="<%=style%>"><%=message%></div>
-      <form>
-         
-    <label>Semester:</label><br>
-    <select name="semester" id="semester" required/>
-    <option value="" selected>--select semester</option>
-    <option value="First">First</option>
-    <option value="Second">Second</option>
-</select><br><br>
+      <form id="semesterForm">
+         <label>Semester:</label><br />
+         <select name="semester" id="semester" required>
+            <option value="" selected>--select semester</option>
+            <option value="First">First</option>
+            <option value="Second">Second</option>
+         </select><br /><br />
 
-        <button type="submit" id="updatebtn">Update</button>
+         <button type="submit" id="updatebtn">Update</button>
       </form>
    </div>
    <div class="footer">
-    <footer>
-      <p style="font-size: 15px; text-align: center;
-      font-style: normal; color: gray;"> &copy; <span id="cr"></span> FCAHPTIB.</p>
-      <p style="font-size: 14px; text-align: center;
-      font-style: normal; color: gray;">Designed by Adeola Quadri. A</p>
-      <p style="font-size: 14px; text-align: center;
-      font-style: normal; color: gray;">Supervised by Dr. Mrs Olarenwaju O T.</p>
-   </footer>
-    </div>
-  <script>
-      let date = new Date
-      document.getElementById("cr").innerHTML = date.getFullYear()
-      document.querySelector('#logout').addEventListener('click', (e)=>{
-      if(confirm('Are sure you want to logout?') == true){
-       fetch('/admin/logout',{
-       method: 'get'})
-      }else{
-       e.preventDefault()
-   }
-   
-})
-const errorMessage = document.getElementById('error')
-    if(errorMessage.innerHTML !== ''){
-        setTimeout(function(){
-            errorMessage.style.display = 'none'
-        },3000)
-    }
+      <footer>
+         <p
+            style="
+               font-size: 15px;
+               text-align: center;
+               font-style: normal;
+               color: gray;
+            "
+         >
+            &copy; <span id="cr"></span> FCAHPTIB.
+         </p>
+         <p
+            style="
+               font-size: 14px;
+               text-align: center;
+               font-style: normal;
+               color: gray;
+            "
+         >
+            Designed by Adeola Quadri. A
+         </p>
+         <p
+            style="
+               font-size: 14px;
+               text-align: center;
+               font-style: normal;
+               color: gray;
+            "
+         >
+            Supervised by Dr. Mrs Olarenwaju O T.
+         </p>
+      </footer>
+   </div>
+   <script>
+      let date = new Date();
+      document.getElementById("cr").innerHTML = date.getFullYear();
 
+      document.querySelector("#logout").addEventListener("click", (e) => {
+         if (confirm("Are sure you want to logout?") == true) {
+            fetch("/admin/logout", {
+               method: "get",
+            });
+         } else {
+            e.preventDefault();
+         }
+      });
 
-document.querySelector('#updatebtn').addEventListener('click', ()=>{   
-const semester = document.getElementById("semester").value;
-const data = {
-  semester: semester
-};
-updateSemester(data)
-})
-function updateSemester(data){
-fetch('/admin/update_semester', {
-  method: 'PUT',
-  headers:{
-    'Content-Type': 'application/json',
-  },
-  body:JSON.stringify(data)
-})
-.then(response => {response.json();
-  if(response.status === 200){
-    alert(`Semester updated successfully!`)
-  }else{
-    alert('Error updating semester...')
-  }
-  })
-}
-  </script>
+      const errorMessage = document.getElementById("error");
+      if (errorMessage.innerHTML !== "") {
+         setTimeout(function () {
+            errorMessage.style.display = "none";
+         }, 3000);
+      }
+
+      document.getElementById("semesterForm").addEventListener("submit", (e) => {
+         e.preventDefault(); // prevent default form submit reload
+
+         const semester = document.getElementById("semester").value;
+         if (!semester) {
+            alert("Please select a semester");
+            return;
+         }
+
+         const data = {
+            semester: semester,
+         };
+
+         updateSemester(data);
+      });
+
+      function updateSemester(data) {
+         fetch("/admin/update_semester", {
+            method: "PUT",
+            headers: {
+               "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+         })
+            .then((response) => {
+               if (response.ok) {
+                  alert("Semester updated successfully!");
+               } else {
+                  alert("Error updating semester...");
+               }
+            })
+            .catch(() => alert("Network error while updating semester."));
+      }
+   </script>
 </body>
 </html>

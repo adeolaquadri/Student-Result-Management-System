@@ -1,141 +1,570 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" 
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/style2.css">
-    <link rel="page icon" type="icon" href="/fcahptib.png">
-    <title>Admin Dashboard</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Dashboard</title>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+  />
+  <link rel="icon" type="image/png" href="/fcahptib.png" />
+
+  <style>
+    /* Reset & base */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f4f7fa;
+      color: #222;
+      line-height: 1.5;
+    }
+    a {
+      text-decoration: none;
+      color: inherit;
+      cursor: pointer;
+    }
+    a:focus,
+    button:focus {
+      outline: 3px solid #2978f0;
+      outline-offset: 2px;
+    }
+
+    /* Header */
+    .header {
+      background: #a73232;
+      padding: 12px 0;
+      color: white;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+      user-select: none;
+    }
+    .header img {
+      height: 50px;
+      vertical-align: middle;
+      margin-bottom: 4px;
+    }
+    .header h3 {
+      margin: 0;
+      font-weight: 600;
+      font-family: 'Calibri', sans-serif;
+    }
+
+    /* Navigation */
+    .menu-bar {
+      background: #7f2525;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      padding: 0 12px;
+    }
+    .menu-bar a,
+    .menu-bar .dropbtn {
+      color: #fff;
+      padding: 14px 18px;
+      font-size: 16px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.3s ease;
+    }
+    .menu-bar a:hover,
+    .menu-bar .dropbtn:hover,
+    .menu-bar a:focus,
+    .menu-bar .dropbtn:focus {
+      background: #a73232;
+      outline: none;
+    }
+
+    /* Dropdown */
+    .dropdown {
+      position: relative;
+      user-select: none;
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #a73232;
+      min-width: 180px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      z-index: 100;
+      border-radius: 0 0 6px 6px;
+      overflow: hidden;
+      top: 100%;
+      left: 0;
+    }
+    .dropdown-content a {
+      display: block;
+      padding: 10px 16px;
+      font-size: 15px;
+      font-weight: 500;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .dropdown-content a:last-child {
+      border-bottom: none;
+    }
+    .dropdown-content a:hover,
+    .dropdown-content a:focus {
+      background-color: #7f2525;
+      outline: none;
+    }
+
+    /* Show dropdown on hover or focus */
+    .dropdown:hover .dropdown-content,
+    .dropdown:focus-within .dropdown-content {
+      display: block;
+    }
+
+    /* Dashboard container */
+    .dashs {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 18px;
+      padding: 20px 12px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .dash {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      padding: 24px;
+      text-align: center;
+      color: #444;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: default;
+      user-select: none;
+    }
+    .dash:hover,
+    .dash:focus-within {
+      box-shadow: 0 8px 20px rgba(167, 50, 50, 0.3);
+      transform: translateY(-6px);
+      outline: none;
+    }
+    .dash p:first-child {
+      font-size: 40px;
+      font-weight: 700;
+      margin: 0 0 6px;
+      color: #a73232;
+    }
+    .dash p:nth-child(2) {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0 0 12px;
+    }
+    .dash i {
+      font-size: 72px;
+      color: rgba(167, 50, 50, 0.25);
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* Info texts */
+    #currentSN,
+    #welcomeBack {
+      max-width: 1100px;
+      margin: 18px auto 0;
+      font-size: 14px;
+      font-weight: 500;
+      color: #555;
+      padding: 0 12px;
+    }
+    #currentSN b,
+    #welcomeBack b {
+      color: #a73232;
+      font-weight: 700;
+    }
+
+    /* Footer */
+    .footer {
+      background: #e6e6e6;
+      padding: 16px 0;
+      margin-top: 40px;
+      font-size: 14px;
+      color: #666;
+      text-align: center;
+      user-select: none;
+    }
+
+    /* Responsive Hamburger Menu */
+    #menu-toggle {
+      display: none;
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      cursor: pointer;
+      width: 30px;
+      height: 25px;
+      z-index: 200;
+      background: none;
+      border: none;
+    }
+    #menu-toggle span {
+      display: block;
+      width: 100%;
+      height: 4px;
+      background-color: white;
+      margin-bottom: 5px;
+      border-radius: 2px;
+      transition: all 0.3s ease-in-out;
+    }
+    #menu-toggle:focus {
+      outline: 3px solid #2978f0;
+      outline-offset: 2px;
+    }
+
+    /* When toggled */
+    .menu-bar.open {
+      flex-direction: column;
+      align-items: flex-start;
+      padding-top: 50px;
+      height: auto;
+      background-color: #7f2525;
+    }
+    .menu-bar.open a,
+    .menu-bar.open .dropbtn {
+      width: 100%;
+      text-align: left;
+      padding-left: 20px;
+    }
+    .menu-bar.open .dropdown-content {
+      position: relative;
+      box-shadow: none;
+      background-color: #8e3333;
+      border-radius: 0;
+    }
+    .menu-bar.open .dropdown:hover .dropdown-content,
+    .menu-bar.open .dropdown:focus-within .dropdown-content {
+      display: block;
+    }
+
+    /* Hide dropdown arrows on mobile */
+    @media (max-width: 768px) {
+      .dropdown .fa-caret-down {
+        display: none;
+      }
+      .menu-bar {
+        justify-content: flex-start;
+        padding-left: 12px;
+      }
+      .menu-bar a,
+      .menu-bar .dropbtn {
+        padding: 14px 12px;
+        font-size: 17px;
+      }
+    }
+
+    /* Show hamburger on mobile */
+    @media (max-width: 768px) {
+      #menu-toggle {
+        display: block;
+      }
+      .menu-bar {
+        display: none;
+        width: 100%;
+      }
+      .menu-bar.open {
+        display: flex;
+      }
+    }
+  </style>
 </head>
 <body>
   <!-- header -->
-  <div class="header">
-    <center><img src="/fcahptib.png" alt="" height="50"></center>
-    <h3 style="color: white; font-family: calibri; text-align: center;">
-        Administrator Section</h3>
+  <header class="header" role="banner">
+    <img src="/fcahptib.png" alt="FCAHPTIB Logo" height="50" />
+    <h3 style="font-family: calibri;">Administrator Section</h3>
+  </header>
+
+  <!-- Hamburger menu toggle for mobile -->
+  <button
+    id="menu-toggle"
+    aria-label="Toggle navigation menu"
+    aria-expanded="false"
+    aria-controls="menu-bar"
+  >
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  <!-- menu bar -->
+  <nav
+    class="menu-bar"
+    id="menu-bar"
+    role="navigation"
+    aria-label="Admin navigation menu"
+  >
+    <a href="/admin/dashboard" tabindex="0">Dashboard</a>
+
+    <!-- Academic Session -->
+    <div
+      class="dropdown"
+      tabindex="0"
+      aria-haspopup="true"
+      aria-expanded="false"
+      aria-label="Session menu"
+    >
+      <button
+        class="dropbtn"
+        aria-haspopup="true"
+        aria-expanded="false"
+        aria-controls="session-menu"
+      >
+        Session <i class="fa fa-caret-down" aria-hidden="true"></i>
+</button>
+<div class="dropdown-content" id="session-menu" role="menu">
+<a href="/admin/add_session" role="menuitem" tabindex="-1" >Add session</a >
+<a href="/admin/manage_session" role="menuitem" tabindex="-1" >Manage session</a >
 </div>
-    <!-- menu bar -->
-    <div class="menu-bar">
-        <a href="/admin/dashboard">Dashboard</a>
+</div>
+<!-- Semester -->
+<div
+  class="dropdown"
+  tabindex="0"
+  aria-haspopup="true"
+  aria-expanded="false"
+  aria-label="Semester menu"
+>
+  <button
+    class="dropbtn"
+    aria-haspopup="true"
+    aria-expanded="false"
+    aria-controls="semester-menu"
+  >
+    Semester <i class="fa fa-caret-down" aria-hidden="true"></i>
+  </button>
+  <div class="dropdown-content" id="semester-menu" role="menu">
+    <a href="/admin/add_semester" role="menuitem" tabindex="-1"
+      >Add semester</a
+    >
+    <a href="/admin/manage_semester" role="menuitem" tabindex="-1"
+      >Manage semester</a
+    >
+  </div>
+</div>
 
-      <!-- Academic Session -->
-        <div class="dropdown">
-          <button class="dropbtn">Session
-            <i class="fa fa-caret-down"></i>
-          </button>
-          <div class="dropdown-content">
-            <a href="/admin/update_session">Update academic session</a>
-          </div>
-        </div>        
-           <!-- Academic Semester -->
-           <div class="dropdown">
-            <button class="dropbtn">Semester
-              <i class="fa fa-caret-down"></i>
-            </button>
-            <div class="dropdown-content">
-              <a href="/admin/update_semester">Update academic semester</a>
-            </div>
-          </div> 
-        <!-- result section -->
-        <div class="dropdown">
-            <button class="dropbtn">Result
-              <i class="fa fa-caret-down"></i>
-            </button>
-            <div class="dropdown-content">
-              <a href="/admin/upload_result">Upload result</a>
-              <a href="/admin/manage_result">Manage result</a>
-            </div>
-          </div>        
+<!-- Result -->
+<div
+  class="dropdown"
+  tabindex="0"
+  aria-haspopup="true"
+  aria-expanded="false"
+  aria-label="Result menu"
+>
+  <button
+    class="dropbtn"
+    aria-haspopup="true"
+    aria-expanded="false"
+    aria-controls="result-menu"
+  >
+    Result <i class="fa fa-caret-down" aria-hidden="true"></i>
+  </button>
+  <div class="dropdown-content" id="result-menu" role="menu">
+    <a href="/admin/upload_result" role="menuitem" tabindex="-1">Add result</a>
+    <a
+      href="/admin/manage_result"
+      role="menuitem"
+      tabindex="-1"
+      >Manage results</a
+    >
+  </div>
+</div>
 
-          <!-- student section -->
-          <div class="dropdown">
-            <button class="dropbtn">Student
-              <i class="fa fa-caret-down"></i>
-            </button>
-            <div class="dropdown-content">
-              <a href="/admin/add_student">Add student</a>
-              <a href="/admin/manage_student">Manage student</a>
-            </div>
-          </div>
-        <!-- course section -->
-        <div class="dropdown">
-            <button class="dropbtn">Course
-              <i class="fa fa-caret-down"></i>
-            </button>
-            <div class="dropdown-content">
-              <a href="/admin/add_course">Add course</a>
-              <a href="/admin/manage_course">Manage courses</a>
-            </div>
-          </div>
-        <a href="/admin/logout" id="logout">Logout</a>
-        <a href="/admin/change_password">Change Password</a>
-    </div>
-    <div>
-        <p  style="margin: 0px 5px 5px 8px; font-size: 12pt;"
-        id="currentSN">Current Session: <b><%=academic[0].Session%>/<%=academic[0].Session + 1%> - <%=academic[0].Semester%></b></p>
-        <p style="margin: 15px 5px 5px 8px; font-size: 14px;"
-        id="welcomeBack">Welcome back, <b><%=username%></b></p>
-    </div>
+<!-- Student -->
+<div
+  class="dropdown"
+  tabindex="0"
+  aria-haspopup="true"
+  aria-expanded="false"
+  aria-label="Student menu"
+>
+  <button
+    class="dropbtn"
+    aria-haspopup="true"
+    aria-expanded="false"
+    aria-controls="student-menu"
+  >
+    Student <i class="fa fa-caret-down" aria-hidden="true"></i>
+  </button>
+  <div class="dropdown-content" id="student-menu" role="menu">
+    <a href="/admin/add_student" role="menuitem" tabindex="-1"
+      >Add student</a
+    >
+    <a href="/admin/manage_student" role="menuitem" tabindex="-1"
+      >Manage student</a
+    >
+  </div>
+</div>
 
-    <!-- dashboards -->
-    <div class="dashs">
-        <div class="dash" id="student_dash">
-          <p style="font-size: 30px;"><%=students.length%></p>
-          <p>Students</p>
-             <i class="fa fa-user" style="font-size: 70px; color: rgba(2, 2, 2, 0.288);"></i>
-          
-        </div>
-        <div class="dash" id="result_dash">
-          <p style="font-size: 30px;"><%=results.length%></p>
-          <p>Results</p>
-          <i class="fa fa-table" style="font-size: 70px; color: rgba(2, 2, 2, 0.288);"></i>
-        </div>
-        <!-- <div class="dash" id="department_dash">
-          <p style="font-size: 30px;"><%=department.length%></p>
-            <p>Department</p>
-            <i class="fa fa-users" style="font-size: 70px; color: rgba(2, 2, 2, 0.082);"></i>
-        </div> -->
-        <div class="dash" id="course_dash">
-          <p style="font-size: 30px;"><%=courses.length%></p>
-          <p>Courses</p>
-          <i class="fa fa-book" style="font-size: 70px; color: rgba(2, 2, 2, 0.288);"></i>
-      </div>
-        <!-- <div class="dash">
-          <p>Current Session: <%=academic[0].Session%></p>
-          <p>Current Semester: <%=academic[0].Semester%></p>
-      </div> -->
-        <div class="dash" id="admin_dash">
-          <p style="font-size: 30px;"><%=admin.length%></p>
-            <p>Admin</p>
-            <i class="fa fa-users" style="font-size: 70px; color: rgba(2, 2, 2, 0.288);"></i>
-        </div>
-    </div>
+<!-- Course -->
+<div
+  class="dropdown"
+  tabindex="0"
+  aria-haspopup="true"
+  aria-expanded="false"
+  aria-label="Course menu"
+>
+  <button
+    class="dropbtn"
+    aria-haspopup="true"
+    aria-expanded="false"
+    aria-controls="course-menu"
+  >
+    Course <i class="fa fa-caret-down" aria-hidden="true"></i>
+  </button>
+  <div class="dropdown-content" id="course-menu" role="menu">
+    <a href="/admin/add_course" role="menuitem" tabindex="-1">Add course</a>
+    <a
+      href="/admin/manage_course"
+      role="menuitem"
+      tabindex="-1"
+      >Manage courses</a
+    >
+  </div>
+</div>
 
-    <!-- footer -->
-    <div class="footer">
-      <footer>
-        <p style="font-size: 15px; text-align: center;
-        font-style: normal; color: gray;"> &copy; <span id="cr"></span> FCAHPTIB.</p>
-        <p style="font-size: 14px; text-align: center;
-        font-style: normal; color: gray;">Designed by Adeola Quadri. A</p>
-        <p style="font-size: 14px; text-align: center;
-        font-style: normal; color: gray;">Supervised by Dr. Mrs Olarenwaju O T.</p>
-     </footer>
-      </div>
-    <script>
-        let date = new Date
-        document.getElementById("cr").innerHTML = date.getFullYear();
-        document.querySelector('#logout').addEventListener('click', (e)=>{
-      if(confirm('Are sure you want to logout?') == true){
-       fetch('/admin/logout',{
-       method: 'get'})
-      }else{
-       e.preventDefault()
-   }
-   
-})
-    </script>
-</body>
-</html>
+<a href="/admin/change_password" tabindex="0">Change Password</a>
+<button
+  id="logout-btn"
+  class="dropbtn"
+  aria-label="Logout"
+  style="
+    margin-left: auto;
+    background: #a73232;
+    border: none;
+    font-weight: 700;
+    color: #fff;
+  "
+>
+  <i class="fa fa-sign-out"></i> Logout
+</button>
+</nav> <!-- Dashboard section --> 
+<main role="main" tabindex="-1" style="max-width: 1100px; margin: 30px auto 0; padding: 0 12px;"> 
+  <p id="currentSN" aria-live="polite" aria-atomic="true">
+     Current session is: <b>2023/2024</b> </p> 
+     <p id="welcomeBack" aria-live="polite" aria-atomic="true"> Welcome back <b>Admin</b>! </p>
+<section class="dashs" aria-label="Quick access dashboard links">
+  <article
+    class="dash"
+    tabindex="0"
+    aria-describedby="descDashboard"
+    role="button"
+    onclick="location.href='/admin/manage_student'"
+    onkeypress="if(event.key==='Enter' || event.key===' ') location.href='/admin/manage_student';"
+  >
+    <p><%=students.length %></p>
+    <p>Students</p>
+    <i class="fa fa-users" aria-hidden="true"></i>
+    <p id="descDashboard" hidden>Manage student information</p>
+  </article>
+
+  <article
+    class="dash"
+    tabindex="0"
+    aria-describedby="descResults"
+    role="button"
+    onclick="location.href='/admin/manage_result'"
+    onkeypress="if(event.key==='Enter' || event.key===' ') location.href='/admin/manage_result';"
+  >
+    <p><%=results.length%></p>
+    <p>Results</p>
+    <i class="fa fa-file-text" aria-hidden="true"></i>
+    <p id="descResults" hidden>Manage student results</p>
+  </article>
+
+  <article
+    class="dash"
+    tabindex="0"
+    aria-describedby="descCourses"
+    role="button"
+    onclick="location.href='/admin/manage_course'"
+    onkeypress="if(event.key==='Enter' || event.key===' ') location.href='/admin/manage_course';"
+  >
+    <p><%=courses.length%></p>
+    <p>Courses</p>
+    <i class="fa fa-book" aria-hidden="true"></i>
+    <p id="descCourses" hidden>Manage courses offered</p>
+  </article>
+
+  <article
+    class="dash"
+    tabindex="0"
+    aria-describedby="descSemester"
+    role="button"
+    onclick="location.href='/admin/manage_semester'"
+    onkeypress="if(event.key==='Enter' || event.key===' ') location.href='/admin/manage_semester';"
+  >
+    <p>2</p>
+    <p>Semesters</p>
+    <i class="fa fa-calendar" aria-hidden="true"></i>
+    <p id="descSemester" hidden>Manage academic semesters</p>
+  </article>
+
+  <article
+    class="dash"
+    tabindex="0"
+    aria-describedby="descSession"
+    role="button"
+    onclick="location.href='/admin/manage_session'"
+    onkeypress="if(event.key==='Enter' || event.key===' ') location.href='/admin/manage_session';"
+  >
+    <p>1</p>
+    <p>Sessions</p>
+    <i class="fa fa-clock-o" aria-hidden="true"></i>
+    <p id="descSession" hidden>Manage academic sessions</p>
+  </article>
+</section>
+</main> 
+<footer class="footer" role="contentinfo">
+   &copy; <%=new Date().getFullYear() %> FCAHPTIB
+   <div>Designed by Adeola Quadri. A</div>
+  <div>Supervised Dr. Mrs Olarenwaju O T.</div>
+   </footer>
+
+ <script>
+  // Mobile menu toggle 
+  const menuToggle = document.getElementById('menu-toggle'); 
+  const menuBar = document.getElementById('menu-bar'); 
+  menuToggle.addEventListener('click', () => { 
+  const isExpanded = menuToggle.getAttribute('aria-expanded') === 'true'; 
+  menuToggle.setAttribute('aria-expanded', !isExpanded); menuBar.classList.toggle('open'); });
+  //  // Dropdowns accessibility enhancement
+   const dropdowns = document.querySelectorAll('.dropdown');
+   dropdowns.forEach((dropdown) => { 
+  const button = dropdown.querySelector('.dropbtn'); 
+  const menu = dropdown.querySelector('.dropdown-content');
+  //  // Toggle dropdown on click 
+  button.addEventListener('click', (e) => {
+   e.preventDefault(); 
+  const expanded = button.getAttribute('aria-expanded') === 'true'; 
+  button.setAttribute('aria-expanded', !expanded); 
+  menu.style.display = expanded ? 'none' : 'block'; });
+  //  // Toggle dropdown on keyboard (Enter / Space)
+   button.addEventListener('keydown', (e) => { 
+  if (e.key === 'Enter' || e.key === ' ') {
+   e.preventDefault(); const expanded = button.getAttribute('aria-expanded') === 'true';
+   button.setAttribute('aria-expanded', !expanded);
+   menu.style.display = expanded ? 'none' : 'block'; 
+  } 
+  }); 
+  // Close dropdown when clicking outside 
+  document.addEventListener('click', (e) => { 
+  if (!dropdown.contains(e.target)) { 
+  button.setAttribute('aria-expanded', false);
+   menu.style.display = 'none'; 
+  } }); });
+  // Logout button example: replace with your logout logic
+   const logoutBtn = document.getElementById('logout-btn');
+   logoutBtn.addEventListener('click', () => { 
+  if (confirm('Are you sure you want to logout?')) {
+   window.location.href = '/admin/logout'; } });
+ </script> 
+ </body>
+  </html> 

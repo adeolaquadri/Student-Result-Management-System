@@ -1,183 +1,336 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Course Registration</title>
-    <link rel="page icon" type="icon" href="/fcahptib.png">
-    <link rel="stylesheet" href="/style.css">
-    <link rel="stylesheet" 
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <script src="/jquery-3.7.1.min.js"></script>
-    <script src="/index.js"></script>
-<style>
-    .bioTable{
-        width: 100%;
-        border-collapse: collapse;
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Course Registration - Student Dashboard</title>
+  <link rel="icon" href="/fcahptib.png" type="image/png" />
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    rel="stylesheet"
+  />
+  <link
+    href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+
+  <style>
+    /* Reset */
+    *, *::before, *::after {
+      box-sizing: border-box;
     }
-   .bioTable td{
-        text-align: center;
-        font-family: calibri;
-        font-size: 16px;
+    body, html {
+      margin: 0; padding: 0; height: 100%;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #fafafa;
+      color: #333;
     }
-    .bioTable th,.bioTable td{
-        border-bottom: 1px solid gainsboro
+
+    /* Layout Grid: header, sidebar, main content, footer */
+    body {
+      display: grid;
+      grid-template-areas:
+        "header header"
+        "sidebar main"
+        "footer footer";
+      grid-template-columns: 220px 1fr;
+      grid-template-rows: 60px 1fr 40px;
+      min-height: 100vh;
     }
-    .courseTable{
-        width: 100%;
-        border-collapse: collapse;
-        border: 1px solid black;
+
+    header.header {
+      grid-area: header;
+      background: #a73232;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1rem;
+      color: white;
     }
-    .courseTable td{
-        text-align: center;
-        font-family: lucida sans;
-        font-weight: 400;
-        font-size: 14px;
-        border: 1px solid black;
-        padding: 5px;
+    header.header img {
+      height: 40px;
     }
-    .courseTable th{
-        height: 50px;
-        font-size: 16px;
-        font-family: cambria;
+    header.header .menu-toggle {
+      font-size: 24px;
+      cursor: pointer;
+      display: none; /* hide on desktop */
+      background: none;
+      border: none;
+      color: white;
     }
-   .courseTable th, .courseTable td{
-        border: 1px solid black;
-        background-color: white;
+
+    aside.sidebar {
+      grid-area: sidebar;
+      background: #7f2525;
+      color: white;
+      padding: 1rem 0;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s ease;
     }
-    #regBTN{
-        padding: 10px;
-        border: none;
-        width: 100px;
-        background-color: rgb(167, 50, 50);
-        color: white;
-        font-size: 15px;
-        margin-top: 5px;
-        cursor: pointer;
+    aside.sidebar.hidden {
+      transform: translateX(-100%);
     }
-</style>
+
+    aside.sidebar p.user-info {
+      margin: 0 1rem 1.5rem;
+      font-size: 1rem;
+      text-align: center;
+    }
+    aside.sidebar p.user-info i {
+      margin-right: 0.5rem;
+    }
+    aside.sidebar nav a {
+      display: block;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      text-decoration: none;
+      transition: background-color 0.3s ease;
+      margin: 0.5rem 1rem;
+      border-radius: 4px;
+    }
+    aside.sidebar nav a:hover,
+    aside.sidebar nav a.active {
+      background-color: #a73232;
+    }
+
+    main.main-content {
+      grid-area: main;
+      padding: 1rem 2rem;
+      background: white;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    main.main-content .alert {
+      margin-bottom: 1rem;
+    }
+
+    main.main-content .session-info {
+      font-weight: 600;
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+    }
+
+    main.main-content .info-box {
+      background: #e7f3ff;
+      border: 1px solid #b3d7ff;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 6px;
+      font-size: 1rem;
+      color: #3178c6;
+    }
+
+    .table-responsive {
+      overflow-x: auto;
+    }
+    table.table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1rem;
+    }
+    table.table th, table.table td {
+      border: 1px solid #ddd;
+      padding: 0.75rem;
+      vertical-align: middle;
+    }
+    table.table th {
+      background-color: #a73232;
+      color: white;
+      text-align: left;
+    }
+    table.table tbody tr:hover {
+      background-color: #f5f5f5;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
+    /* Footer */
+    footer.footer {
+      grid-area: footer;
+      /* background: #f0f0f0; */
+      color: #666;
+      font-size: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.5rem 1rem;
+      user-select: none;
+    }
+
+    /* Responsive */
+
+    @media (max-width: 768px) {
+      body {
+        grid-template-areas:
+          "header"
+          "main"
+          "footer";
+        grid-template-columns: 1fr;
+        grid-template-rows: 60px 1fr 40px;
+      }
+      aside.sidebar {
+        position: fixed;
+        top: 60px;
+        left: 0;
+        height: calc(100% - 60px);
+        width: 220px;
+        z-index: 1000;
+        transform: translateX(-100%);
+        box-shadow: 2px 0 5px rgba(0,0,0,0.3);
+      }
+      aside.sidebar.show {
+        transform: translateX(0);
+        background: #7f2525;
+      }
+      header.header .menu-toggle {
+        display: block;
+      }
+      main.main-content {
+        padding: 1rem;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="header">
-        <img src="fcahptib.png" alt="" height="50">
-        <a href="javascript:void(0);" class="icon" onclick="myFunction()">
-            <i class="fa fa-bars" style="font-size: 20px; color: #fff;
-             align-self: center;"></i>
-          </a>  
-    </div>
-    <div class="sidebar" id="sideBar">
-        <p style="font-family: calibri; font-size: 16px; text-align: center;"><%=fullname%></p><br>
-        
-        <p style="font-family: calibri; font-size: 16px; text-align: center;
-        color: rgb(71, 71, 71); display: block;">
-        <i class="fa fa-fw fa-map-marker" style="font-size: 16px;"></i><%=department%></p><br><br>
+  <header class="header">
+    <img src="fcahptib.png" alt="FCAHPTIB Logo" />
+    <button aria-label="Toggle menu" class="menu-toggle" id="menuToggle">
+      <i class="fa fa-bars"></i>
+    </button>
+  </header>
 
-            <a href="/dashboard" class="active"><i class="fa fa-fw fa-dashboard"></i>Dashboard</a><br><br><br>
-            <a href="/profile" id="profile"><i class="fa fa-fw fa-user"></i>Profile</a><br><br><br>
-            <a href="/course_registration"><i class="fa fa-fw fa-book"></i>Course Registration</a><br><br><br>
-            <a href="RePrint_Course_Form"><i class="fa fa-fw fa-book"></i>Reprint course form</a><br><br><br>
-            <a href="/result"><i class="fa fa-fw fa-table"></i>My Result</a><br><br><br>
-            <a href="/change_password"><i class="fa fa-fw fa-lock"></i>Change Password</a><br><br><br>
-            <a href="/logout" id="logout"><i class="fa fa-fw fa-sign-out"></i>Logout</a><br><br><br>
-    </div>
+  <aside class="sidebar" id="sidebar" aria-label="Sidebar Navigation">
+    <p class="user-info" style="text-transform: capitalize;">
+      <i class="fa fa-fw fa-user"></i> <%= fullname %>
+    </p>
+    <p class="user-info" style="color: #ddd;">
+      <i class="fa fa-fw fa-map-marker"></i> <%= department %>
+    </p>
 
-    <!-- main content section -->
-    <div class="main-content" id="mainContent">
-        <div class="main">
-            <div class="document">
-                <p style="background-color: rgb(167, 50, 50);;"><%=fullname %> COURSE REGISTRATION</p>
-                <table class="bioTable">
-                    <tr>
-                        <td>Student Name:</td><td><%=fullname %></td>
-                    </tr>
-                    <tr>
-                        <td>Matriculation Number:</td><td><%=matric %></td>
-                    </tr>
-                    <tr>
-                        <td>Course of Study:</td><td><%=department %></td>
-                    </tr>
-                    <tr>
-                        <td>Level:</td><td><%=level %></td>
-                    </tr>
-                    <tr>
-                        <td>Session:</td><td><%=session%>/<%=session2%></td>
-                    </tr>
-                    <tr>
-                        <td>Semester:</td><td style="text-transform: capitalize;"><%=semester %></td>
-                    </tr>
-                </table>
-               </div>
-               <%if(courses.length >= 1){%>
-            <table class="courseTable" id="mycourseTable">
-                <th>Course Code</th>
-                <th>Course Title</th>
-                <th>Course Unit</th>
-                <th>Status</th>
-                <%courses.forEach(course => { %>
-                    <tr>
-                        <td><%=course.COURSE_ID%></td>
-                        <td class="course_title"><%=course.COURSE_TITLE%></td>
-                        <td id="course-unit"><%=course.COURSE_UNIT%></td>
-                        <td id="status">Unregistered</td>
-                    </tr>
-                <% })%>
+    <nav>
+      <a href="/dashboard">
+        <i class="fa fa-fw fa-dashboard"></i> Dashboard
+      </a>
+      <a href="/profile" >
+        <i class="fa fa-fw fa-user"></i> Profile
+      </a>
+      <a href="/course_registration" class="active" aria-current="page">
+        <i class="fa fa-fw fa-book"></i> Course Registration
+      </a>
+      <a href="RePrint_Course_Form">
+        <i class="fa fa-fw fa-book"></i> Reprint Course Form
+      </a>
+      <a href="/result">
+        <i class="fa fa-fw fa-table"></i> My Result
+      </a>
+      <a href="/change_password">
+        <i class="fa fa-fw fa-lock"></i> Change Password
+      </a>
+      <a href="/logout" id="logout">
+        <i class="fa fa-fw fa-sign-out"></i> Logout
+      </a>
+    </nav>
+  </aside>
+
+  <main class="main-content" role="main" tabindex="-1">
+
+    <header class="session-info" style="margin-bottom: 1rem;">
+      Course Registration — 
+      <span><%= session %></span> / <span><%= session2 %></span> — 
+      <span style="text-transform: capitalize;"><%= semester %> Semester</span>
+    </header>
+
+    <section class="info-box" style="margin-bottom: 1rem;">
+      <p>
+        Matric No: <strong><%= matric %></strong> |
+        Level: <strong><%= level %></strong> |
+        Department: <strong><%= department %></strong>
+      </p>
+    </section>
+
+    <form action="/submit_registration" method="POST" aria-label="Course Registration Form">
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Course Code</th>
+              <th scope="col">Course Title</th>
+              <th scope="col">Credit Unit</th>
+              <th scope="col" class="text-center">Select</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (courses && courses.length) { %>
+              <% courses.forEach((course, i) => { %>
                 <tr>
-                    <td></td>
-                    <%total_unit.forEach(units_sum => { %>
-                    <td style="text-align: right;">Total Unit:</td><td><%=units_sum.total%></td>
-                    <% })%>
+                  <td><%= i + 1 %></td>
+                  <td><%= course.code %></td>
+                  <td><%= course.title %></td>
+                  <td><%= course.unit %></td>
+                  <td class="text-center">
+                    <input 
+                      type="checkbox" 
+                      name="selectedCourses[]" 
+                      value="<%= course.code %>" 
+                      checked 
+                      aria-checked="true"
+                    />
+                  </td>
                 </tr>
-                <form action="/course_registration" method="post">
-                        <input type="hidden" name="student_id" value="<%=matric%>">
-                        <input type="hidden" name="department" value="<%=department%>">
-                        <input type="hidden" name="semester" value="<%=semester%>">
-                        <input type="hidden" name="session" value="<%=session%>">
-                        <input type="hidden" name="level" value="<%=level%>">
-                        <input type="hidden" name="status" value="Registered">
-            </table>
-            <button type="submit" id="regBTN">Register</button>
-            </form>
-        <%}else{%>
-            <div style="font-size: 18px; font-family: calibri; background-color: rgba(37, 164, 248, 0.42);padding: 10px; width: 100%; justify-content: center; text-align:center;">
-                Courses Unavailable</div>
-            <%}%>
-        </div>
+              <% }) %>
+            <% } else { %>
+              <tr>
+                <td colspan="5" class="text-center text-danger">
+                  No courses available.
+                </td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
 
-    <!-- footer section -->
-    <footer>
-        <p style="font-size: 14px; text-align: center;
-        font-style: normal; font-family: sans-serif; color: gray;">
-        <span id="cr"></span> &copy;FCAHPTIB.</p>
-        <p style="font-size: 14px; text-align: center;
-        font-style: normal; font-family: sans-serif; color: gray;">Designed by Adeola Quadri. A</p>
-        <p style="font-size: 14px; text-align: center;
-        font-style: normal; font-family: sans-serif; color: gray;">Supervised by Dr. Mrs Olarenwaju O T.</p>
-     </footer>
-    </div>
-        <!-- javascript code section -->
-        <script>
-document.querySelector('#logout').addEventListener('click', (e)=>{
-   if(confirm('Are sure you want to logout?') == true){
-       fetch('/logout',{
-       method: 'get'})
-   }else{
-       e.preventDefault()
-   }
-   
-})
-let date = new Date()
-document.getElementById('cr').innerHTML = date.getFullYear();
-function myFunction() {
-var x = document.getElementById("sideBar");
-if (x.style.display === "block") {
-x.style.display = "none";
-document.getElementById("mainContent").style.marginLeft = "0";
-} else {
-x.style.display = "block";
-document.getElementById("mainContent").style.marginLeft = "180px";
+      <div class="text-right" style="margin-top: 1rem;">
+        <button type="submit" class="btn btn-success">
+          <i class="fa fa-check"></i> Submit Registration
+        </button>
+      </div>
+    </form>
+  </main>
 
-}
-}
-        </script>
+  <footer class="footer" role="contentinfo">
+    <div>&copy; <%= new Date().getFullYear() %> FCAHPTIB.</div>
+    <div>Designed by Adeola Quadri. A</div>
+    <div>Supervised Dr. Mrs Olarenwaju O T.</div>
+  </footer>
+
+  <script src="/jquery-3.7.1.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <script>
+    // Sidebar toggle for mobile
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+
+    menuToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('show');
+    });
+
+    // Confirm logout
+    document.querySelector('#logout').addEventListener('click', (e) => {
+      if (!confirm('Are you sure you want to logout?')) {
+        e.preventDefault();
+      } else {
+        fetch('/logout', { method: 'GET' });
+      }
+    });
+  </script>
 </body>
 </html>

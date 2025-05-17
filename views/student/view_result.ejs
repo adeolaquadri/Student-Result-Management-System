@@ -1,125 +1,248 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-   <meta charset="UTF-8">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>View result</title>
-   <style>
-   .bioTable{
-        width: 100%;
-        border: 1px solid;
-        padding: 5px;
-   }
-   .bioTable td{
-      font-size: 16px;
-      font-family: cambria;
-   }
-    .resultTable{
-      width: 100%;
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Student Result</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
+  <style>
+    /* Reset & base */
+    * {
+      box-sizing: border-box;
     }
-   .resultTable, .resultTable th, .resultTable td{
-      border: 1px solid;
-      padding: 7px;
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #f9fafb;
+      margin: 0;
+      padding: 1rem;
+      color: #333;
+    }
+
+    /* Container */
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    /* Header */
+    header {
       text-align: center;
-   }
-   .resultTable td{
-      font-size: 13.5px;
-   }
-   .heading{
+      margin-bottom: 1.5rem;
+    }
+    header img {
+      height: 60px;
+      margin-bottom: 0.5rem;
+    }
+    header h1 {
+      font-size: 1.5rem;
+      margin: 0;
+      font-weight: 700;
+      color: #a73232;
+    }
+    header h2 {
+      font-size: 1.1rem;
+      font-weight: 400;
+      margin-top: 0.2rem;
+      color: #666;
+    }
+
+    /* Student info table */
+    .bioTable {
       width: 100%;
-   }
-   .heading, .heading th, .heading td{
-      border: 1px solid;
-      padding: 5px;
-   }
-   .sub-heading{
+      border-collapse: collapse;
+      margin-bottom: 2rem;
+    }
+    .bioTable td {
+      padding: 10px 8px;
+      border: 1px solid #ddd;
+      font-size: 16px;
+    }
+    .bioTable td:first-child {
+      font-weight: 600;
+      width: 160px;
+      background: #f7f7f7;
+    }
+
+    /* Result Table */
+    .resultTable {
       width: 100%;
-   }
-   .sub-heading, .sub-heading th, .sub-heading td{
-      border: 1px solid;
-      padding: 2px;
+      border-collapse: collapse;
+      margin-bottom: 1.5rem;
+    }
+    .resultTable th, .resultTable td {
+      border: 1px solid #ccc;
+      padding: 10px 6px;
       text-align: center;
-   }
-   </style>
+      font-size: 14px;
+    }
+    .resultTable th {
+      background-color: #a73232;
+      color: white;
+      font-weight: 600;
+    }
+    .resultTable tbody tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    /* Highlight pass/repeat */
+    .pass {
+      color: green;
+      font-weight: 600;
+    }
+    .repeat {
+      color: red;
+      font-weight: 600;
+    }
+
+    /* Summary info */
+    .summary {
+      font-weight: 700;
+      font-size: 16px;
+      margin-top: 1rem;
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .summary > div {
+      flex: 1 1 150px;
+      background: #eef6ff;
+      border: 1px solid #b3d7ff;
+      padding: 0.8rem 1rem;
+      border-radius: 6px;
+      color: #3178c6;
+    }
+
+    /* PDF Button */
+    .print-button {
+      background-color: #a73232;
+      border: none;
+      color: white;
+      padding: 0.8rem 1.6rem;
+      font-size: 1rem;
+      font-weight: 700;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-bottom: 1rem;
+      transition: background-color 0.3s ease;
+      display: block;
+      margin-left: auto;
+      margin-right: 0;
+    }
+    .print-button:hover {
+      background-color: #7f2525;
+    }
+
+    /* Print Styles */
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+        margin: 0;
+        color: black;
+      }
+      .print-button {
+        display: none;
+      }
+      .container {
+        box-shadow: none;
+        border: none;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        max-width: 100%;
+      }
+      header h1, header h2 {
+        color: black;
+      }
+      .resultTable th {
+        background-color: #444 !important;
+        -webkit-print-color-adjust: exact;
+      }
+      .pass {
+        color: black !important;
+      }
+      .repeat {
+        color: black !important;
+      }
+      .summary > div {
+        background: none;
+        border: none;
+        color: black;
+      }
+    }
+  </style>
 </head>
 <body>
-   <div>
-      <table class="heading">
-         <tr style="padding: 0;">
-            <td><center><img src="/fcahptib.png" height="50" alt=""/></center>
-            <h2 style="font-size: 16pt; text-align: center;">FEDERAL COLLEGE OF ANIMAL HEALTH AND PRODUCTION TECHNOLOGY, IBADAN.</h2></td>
-         </tr>
-      </table>
-      <table class="sub-heading">
-         <tr>
-      <td><h3>Student's Result</h3></td>
-      </tr>
-      </table>
-   <table class="bioTable">
-      <tr>
-          <td><b>Student Name:</b></td><td style="font-family: monospace;"><%=fullname%></td>
-      </tr>
-      <tr>
-          <td><b>Matriculation Number:</b></td><td style="font-family: monospace;"><%=matric %></td>
-      </tr>
-      <tr>
-          <td><b>Course of Study:</b></td><td style="font-family: monospace;"><%=department %></td>
-      </tr>
-      <tr>
-          <td><b>Level:</b></td><td style="font-family: monospace;"><%=level %></td>
-      </tr>
-      <tr>
-         <td><b>Session:</b></td><td style="font-family: monospace;"><%=session %>/<%=session + 1%></td>
-     </tr>
+  <div class="container" role="main" aria-label="Student Result">
+    <header>
+      <img src="/fcahptib.png" alt="FCAHPTIB Logo" />
+      <h1>FEDERAL COLLEGE OF ANIMAL HEALTH AND PRODUCTION TECHNOLOGY, IBADAN</h1>
+      <h2>Student's Result</h2>
+    </header>
 
-  <!-- <tr>
-   <td><b>Email:</b></td><td style="font-family: monospace;"></td>
-</tr> -->
-  </table>
+    <button class="print-button" onclick="window.print()">Print / Save as PDF</button>
 
-  <table class="resultTable">
-   <tr>
-   <th>S/N</th>
-   <th>Course Code</th>
-   <th>Course Title</th>
-   <th>Semester</th>
-   <th>Score</th>
-   <th>CU</th>
-   <th>CP</th>
-   <th>GP</th>
-   <th>Remark</th>
-   </tr>
-   <%for(let i = 1; i <= result.length; i++){%>
-   <%result.forEach(res => {%>
-   <tr>
-      <td><%=i++%></td>
-      <td><%=res.CourseId%></td>
-      <td><%=res.CourseTitle%></td>
-      <td><%=res.Semester%></td>
-      <td><%=res.Score%></td>
-      <td><%=res.CourseUnit%></td>
-      <td><%=res.CP%></td>
-      <td><%=res.GP%></td>
-      <%if(res.GP != 0){%>
-         <td>Pass</td>
-      <%}else{%>
-         <td>Repeat</td>
-      <%}%>
-   </tr>
-<%})%>
-<%}%>
-</table>
-   <p><b>TGP:</b> <%=tgp%></p>
-   <p><b>TCU:</b> <%=tcu%></p>
-   <p><b>GPA:</b> <%=gpa%></p>
-   <%if(session==adYear + 1 && reg.length != 1){%>
-   <p><b>CGPA:</b> <%=cgpa.toFixed(2)%></p>
-   <%}else{%>
-   <p><b>CGPA:</b> <%=gpa%></p>
-   <%}%>
-</div>
-<script>
-   window.print()
-</script>
+    <table class="bioTable" aria-describedby="studentInfo">
+      <tbody>
+        <tr><td>Student Name:</td><td><%= fullname %></td></tr>
+        <tr><td>Matriculation Number:</td><td><%= matric %></td></tr>
+        <tr><td>Course of Study:</td><td><%= department %></td></tr>
+        <tr><td>Level:</td><td><%= level %></td></tr>
+        <tr><td>Session:</td><td><%= session %>/<%= session + 1 %></td></tr>
+      </tbody>
+    </table>
+
+    <table class="resultTable" aria-describedby="resultTableCaption">
+      <caption id="resultTableCaption" style="text-align:left; font-weight:700; margin-bottom:0.5rem;">Results</caption>
+      <thead>
+        <tr>
+          <th>S/N</th>
+          <th>Course Code</th>
+          <th>Course Title</th>
+          <th>Semester</th>
+          <th>Score</th>
+          <th>CU</th>
+          <th>CP</th>
+          <th>GP</th>
+          <th>Remark</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% result.forEach((res, index) => { %>
+          <tr>
+            <td><%= index + 1 %></td>
+            <td><%= res.CourseId %></td>
+            <td><%= res.CourseTitle %></td>
+            <td><%= res.Semester %></td>
+            <td><%= res.Score %></td>
+            <td><%= res.CourseUnit %></td>
+            <td><%= res.CP %></td>
+            <td><%= res.GP %></td>
+            <td class="<%= res.GP !== 0 ? 'pass' : 'repeat' %>">
+              <%= res.GP !== 0 ? 'Pass' : 'Repeat' %>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+
+    <div class="summary" aria-label="Summary of grades">
+      <div><strong>TGP:</strong> <%= tgp %></div>
+      <div><strong>TCU:</strong> <%= tcu %></div>
+      <div><strong>GPA:</strong> <%= gpa %></div>
+      <div>
+        <strong>CGPA:</strong> 
+        <% if(session == adYear + 1 && reg.length != 1){ %>
+          <%= cgpa.toFixed(2) %>
+        <% } else { %>
+          <%= gpa %>
+        <% } %>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
