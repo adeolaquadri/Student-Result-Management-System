@@ -69,9 +69,9 @@ router.get('/dashboard', async (req, res) => {
     const student = studentRows[0];
     let current_level;
 
-    if (academic[0].session === student.Admission_Year) {
+    if (academic[0].session == student.Admission_Year) {
       current_level = student.Level + 1;
-    } else if (academic[0].session === student.Admission_Year + 1) {
+    } else if (academic[0].session == student.Admission_Year + 1) {
       current_level = student.Level + 2;
     } else {
       current_level = 'FGS';
