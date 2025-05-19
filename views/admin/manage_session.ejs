@@ -2,17 +2,77 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Update Academic Session</title>
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
-  />
-  <link rel="stylesheet" href="/css/admin.css">
-  <link rel="icon" type="image/png" href="/fcahptib.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Manage Academic Session</title>
+  <link rel="stylesheet" href="/css/admin.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+    }
+
+    h2 {
+      color: #7f2525;
+      text-align: center;
+    }
+
+    form {
+      max-width: 400px;
+      margin: 20px auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 6px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      padding: 10px;
+      background: #a73232;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+      width: 100%;
+    }
+
+    table {
+      width: 90%;
+      margin: 40px auto;
+      border-collapse: collapse;
+    }
+
+    table, th, td {
+      border: 1px solid #ccc;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: center;
+    }
+
+    .actions button {
+      margin: 0 5px;
+      padding: 5px 10px;
+    }
+  </style>
 </head>
 <body>
-  <!-- header -->
+
+    <!-- header -->
   <header class="header" role="banner">
     <img src="/fcahptib.png" alt="FCAHPTIB Logo" height="50" />
     <h3 style="font-family: calibri;">Administrator Section</h3>
@@ -56,34 +116,9 @@
         Session <i class="fa fa-caret-down" aria-hidden="true"></i>
 </button>
 <div class="dropdown-content" id="session-menu" role="menu">
-<a href="/admin/add_session" role="menuitem" tabindex="-1" >Add session</a >
-<a href="/admin/manage_session" role="menuitem" tabindex="-1" >Manage session</a >
+<a href="/admin/manage_session" role="menuitem" tabindex="-1" >Manage Academic Session</a >
 </div>
 </div>
-<!-- Semester -->
-<div
-  class="dropdown"
-  tabindex="0"
-  aria-haspopup="true"
-  aria-expanded="false"
-  aria-label="Semester menu"
->
-  <button
-    class="dropbtn"
-    aria-haspopup="true"
-    aria-expanded="false"
-    aria-controls="semester-menu"
-  >
-    Semester <i class="fa fa-caret-down" aria-hidden="true"></i>
-  </button>
-  <div class="dropdown-content" id="semester-menu" role="menu">
-    <a href="/admin/add_semester" role="menuitem" tabindex="-1"
-      >Add semester</a
-    >
-    <a href="/admin/manage_semester" role="menuitem" tabindex="-1"
-      >Manage semester</a
-    >
-  </div>
 </div>
 
 <!-- Result -->
@@ -182,66 +217,53 @@
   <i class="fa fa-sign-out"></i> Logout
 </button>
 </nav>
-   <div class="upload">
-      <h3>Update Academic Session</h3>
-      <div class="" id="error" style="<%=style%>"><%=message%></div>
-<label>Session:</label><br>
-<input type="number" name="session" id="session" placeholder="e.g 2025" required minlength="4" maxlength="4">
-<br><br>
-        <button type="submit" id="updatebtn">Update</button>
-   </div>
-   <div class="footer">
-    <footer>
-      <p style="font-size: 15px; text-align: center;
-      font-style: normal; color: gray;"> &copy; <span id="cr"></span> FCAHPTIB.</p>
-      <p style="font-size: 14px; text-align: center;
-      font-style: normal; color: gray;">Designed by Adeola Quadri. A</p>
-      <p style="font-size: 14px; text-align: center;
-      font-style: normal; color: gray;">Supervised by Dr. Mrs Olarenwaju O T.</p>
-   </footer>
-    </div>
-  <script>
-      let date = new Date
-      document.getElementById("cr").innerHTML = date.getFullYear()
-      document.querySelector('#logout').addEventListener('click', (e)=>{
-      if(confirm('Are sure you want to logout?') == true){
-       fetch('/admin/logout',{
-       method: 'get'})
-      }else{
-       e.preventDefault()
-   }
-   
-})
-const errorMessage = document.getElementById('error')
-    if(errorMessage.innerHTML !== ''){
-        setTimeout(function(){
-            errorMessage.style.display = 'none'
-        },3000)
-    }
 
-document.querySelector('#updatebtn').addEventListener('click', ()=>{   
-const session = document.getElementById("session").value;
-const data = {
-  session: session
-};
-updateSession(data)
-})
-function updateSession(data){
-fetch('/admin/update_session', {
-  method: 'PUT',
-  headers:{
-    'Content-Type': 'application/json',
-  },
-  body:JSON.stringify(data)
-})
-.then(response => {response.json();
-  if(response.status === 200){
-    alert(`Academic session updated successfully!`)
-  }else{
-    alert('Error updating academic session...')
-  }
-  })
-}
-  </script>
+  <h2>Manage Academic Sessions & Semesters</h2>
+
+  <form action="/admin/add-session" method="POST">
+  <label>Session</label>
+  <input type="text" name="session" required>
+  
+  <label>Semester</label>
+  <select name="semester" required>
+    <option value="First">First</option>
+    <option value="Second">Second</option>
+  </select>
+
+  <label>Mark as Current?</label>
+  <input type="checkbox" name="is_current">
+
+  <button type="submit">Add</button>
+</form>
+
+
+  <% if (records.length > 0) { %>
+    <table>
+      <thead>
+        <tr>
+          <th>Academic Session</th>
+          <th>Semester</th>
+          <th>Date Added</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% records.forEach(r => { %>
+          <tr>
+            <td><%= r.session %></td>
+            <td><%= r.semester %></td>
+            <td><%= new Date(r.createdAt).toLocaleDateString() %></td>
+            <td class="actions">
+              <form action="/admin/session/<%= r._id %>?_method=DELETE" method="POST" style="display:inline;">
+                <button type="submit">Delete</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } else { %>
+    <p style="text-align:center;">No academic session added yet.</p>
+  <% } %>
 </body>
 </html>

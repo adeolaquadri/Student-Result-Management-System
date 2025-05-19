@@ -60,7 +60,7 @@ router.get('/dashboard', async (req, res) => {
     const verify = jwt.verify(req.cookies.jwt, process.env.secret_key);
     const query = util.promisify(dbConnection.query).bind(dbConnection);
 
-    const academic = await query('SELECT * FROM academic');
+    const academic = await query('SELECT * FROM academic_sessions WHERE is_current = TRUE LIMIT 1');
     if (academic.length === 0) throw new Error('No academic session found');
 
     const studentRows = await query('SELECT * FROM student WHERE MatricNo = ?', [verify.matric]);
@@ -69,9 +69,9 @@ router.get('/dashboard', async (req, res) => {
     const student = studentRows[0];
     let current_level;
 
-    if (academic[0].Session === student.Admission_Year) {
+    if (academic[0].session === student.Admission_Year) {
       current_level = student.Level + 1;
-    } else if (academic[0].Session === student.Admission_Year + 1) {
+    } else if (academic[0].session === student.Admission_Year + 1) {
       current_level = student.Level + 2;
     } else {
       current_level = 'FGS';
@@ -82,9 +82,8 @@ router.get('/dashboard', async (req, res) => {
       matric: verify.matric,
       department: verify.department,
       level: current_level,
-      session: academic[0].Session,
-      session2: academic[0].Session + 1,
-      semester: academic[0].Semester,
+      session: academic[0].session,
+      semester: academic[0].semester,
       message: "",
       alert: ""
     });
@@ -154,29 +153,27 @@ router.get('/change_password', async (req, res) => {
     const verify = jwt.verify(req.cookies.jwt, process.env.secret_key);
     const query = util.promisify(dbConnection.query).bind(dbConnection);
 
-    const [academic] = await query('SELECT * FROM academic');
+    const [academic] = await query('SELECT * FROM academic_sessions WHERE is_current = TRUE LIMIT 1');
     const [student] = await query('SELECT * FROM student WHERE MatricNo = ?', [verify.matric]);
 
     let current_level;
     const admissionYear = student.Admission_Year;
 
-    if (academic.Session == admissionYear) {
+    if (academic.session == admissionYear) {
       current_level = student.Level + 1;
-    } else if (academic.Session == admissionYear + 1) {
+    } else if (academic.session == admissionYear + 1) {
       current_level = student.Level + 2;
     } else {
       current_level = 'FGS';
     }
 
-    if (academic.Session - admissionYear > 3) {
+    if (academic.session - admissionYear > 3) {
       return res.render('student/dashboard', {
         fullname: verify.fullname,
         matric: verify.matric,
         department: verify.department,
         level: current_level,
-        session: academic.Session,
-        session2: academic.Session + 1,
-        semester: academic.Semester,
+        session: academic,
         message: 'Your studentship is elapsed! Kindly visit the admin',
         alert: 'alert alert-danger'
       });
@@ -232,10 +229,10 @@ router.get('/course_registration', (req, res) => {
   try {
     const verify = jwt.verify(req.cookies.jwt, process.env.secret_key);
 
-    dbConnection.query('SELECT * FROM academic LIMIT 1', (err, academicRow) => {
+    dbConnection.query('SELECT * FROM academic_sessions WHERE is_current = TRUE LIMIT 1', (err, academicRow) => {
       if (err) throw err;
-      const session = academicRow[0].Session;
-      const semester = academicRow[0].Semester;
+      const session = academicRow[0].session;
+      const semester = academicRow[0].semester;
 
       dbConnection.query('SELECT * FROM student WHERE MatricNo = ?', [verify.matric], (err, students) => {
         if (err) throw err;
@@ -344,7 +341,7 @@ router.get('/result', async (req, res) => {
     const query = util.promisify(dbConnection.query).bind(dbConnection);
 
     // Fetch current academic session info
-    const academic = await query('SELECT * FROM academic');
+    const academic = await query('SELECT * FROM academic_sessions WHERE is_current = TRUE LIMIT 1');
     if (academic.length === 0) throw new Error('Academic session not found');
 
     // Fetch student info by matric
@@ -354,24 +351,24 @@ router.get('/result', async (req, res) => {
     const student = students[0];
     let current_level;
 
-    if (academic[0].Session == student.Admission_Year) {
+    if (academic[0].session == student.Admission_Year) {
       current_level = student.Level + 1;
-    } else if (academic[0].Session == student.Admission_Year + 1) {
+    } else if (academic[0].session == student.Admission_Year + 1) {
       current_level = student.Level + 2;
     } else {
       current_level = 'FGS';
     }
 
     // Check if student’s session elapsed
-    if (academic[0].Session - student.Admission_Year > 3) {
+    if (academic[0].session - student.Admission_Year > 3) {
       return res.render('student/dashboard', {
         fullname: verify.fullname,
         matric: verify.matric,
         department: verify.department,
         level: current_level,
-        session: academic[0].Session,
-        session2: academic[0].Session + 1,
-        semester: academic[0].Semester,
+        session: academic[0].session,
+        session2: academic[0].session + 1,
+        semester: academic[0].semester,
         message: 'Your studentship is elapsed! Kindly visit the admin',
         alert: 'alert alert-danger',
       });
@@ -433,7 +430,7 @@ router.get('/RePrint_Course_Form', (req, res) => {
   try {
     const verify = jwt.verify(req.cookies.jwt, process.env.secret_key);
 
-    dbConnection.query('SELECT * FROM academic', (err, academicRows) => {
+    dbConnection.query('SELECT * FROM academic_sessions WHERE is_current = TRUE LIMIT 1', (err, academicRows) => {
       if (err) {
         console.error('Academic session fetch error:', err);
         return res.status(500).send("Server error.");
@@ -451,7 +448,7 @@ router.get('/RePrint_Course_Form', (req, res) => {
 
         // Determine current level
         let current_level;
-        const yearDiff = academic.Session - student.Admission_Year;
+        const yearDiff = academic.session - student.Admission_Year;
         if (yearDiff === 0) current_level = student.Level + 1;
         else if (yearDiff === 1) current_level = student.Level + 2;
         else current_level = 'FGS';
@@ -463,15 +460,15 @@ router.get('/RePrint_Course_Form', (req, res) => {
             matric: verify.matric,
             department: verify.department,
             level: current_level,
-            session: academic.Session,
-            session2: academic.Session + 1,
-            semester: academic.Semester,
+            session: academic.session,
+            session2: academic.session + 1,
+            semester: academic.semester,
             message: 'Your studentship is elapsed! Kindly visit the admin',
             alert: 'alert alert-danger'
           });
         }
 
-        const semester = academic.Semester;
+        const semester = academic.semester;
         const department = verify.department;
 
         const totalUnitsQuery = `
@@ -536,10 +533,10 @@ router.get('/view_result', async (req, res) => {
     const query = util.promisify(dbConnection.query).bind(dbConnection);
     const verify = jwt.verify(req.cookies.jwt, process.env.secret_key);
 
-    const [academic] = await query('SELECT * FROM academic');
+    const [academic] = await query('SELECT * FROM academic_sessions WHERE is_current = TRUE LIMIT 1');
     const [student] = await query('SELECT * FROM student WHERE MatricNo = ?', [verify.matric]);
 
-    const yearDiff = academic.Session - student.Admission_Year;
+    const yearDiff = academic.session - student.Admission_Year;
     let current_level = yearDiff === 0 ? student.Level + 1
                       : yearDiff === 1 ? student.Level + 2
                       : 'FGS';
@@ -550,9 +547,9 @@ router.get('/view_result', async (req, res) => {
         matric: verify.matric,
         department: verify.department,
         level: current_level,
-        session: academic.Session,
-        session2: academic.Session + 1,
-        semester: academic.Semester,
+        session: academic.session,
+        session2: academic.session + 1,
+        semester: academic.semester,
         message: 'Your studentship is elapsed! Kindly visit the admin',
         alert: 'alert alert-danger'
       });

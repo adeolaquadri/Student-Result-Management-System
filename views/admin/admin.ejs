@@ -53,37 +53,11 @@
         aria-expanded="false"
         aria-controls="session-menu"
       >
-        Session <i class="fa fa-caret-down" aria-hidden="true"></i>
+       Session <i class="fa fa-caret-down" aria-hidden="true"></i>
 </button>
 <div class="dropdown-content" id="session-menu" role="menu">
-<a href="/admin/add_session" role="menuitem" tabindex="-1" >Add session</a >
-<a href="/admin/manage_session" role="menuitem" tabindex="-1" >Manage session</a >
+<a href="/admin/manage_session" role="menuitem" tabindex="-1" >Manage Academic Session</a >
 </div>
-</div>
-<!-- Semester -->
-<div
-  class="dropdown"
-  tabindex="0"
-  aria-haspopup="true"
-  aria-expanded="false"
-  aria-label="Semester menu"
->
-  <button
-    class="dropbtn"
-    aria-haspopup="true"
-    aria-expanded="false"
-    aria-controls="semester-menu"
-  >
-    Semester <i class="fa fa-caret-down" aria-hidden="true"></i>
-  </button>
-  <div class="dropdown-content" id="semester-menu" role="menu">
-    <a href="/admin/add_semester" role="menuitem" tabindex="-1"
-      >Add semester</a
-    >
-    <a href="/admin/manage_semester" role="menuitem" tabindex="-1"
-      >Manage semester</a
-    >
-  </div>
 </div>
 
 <!-- Result -->
@@ -185,7 +159,9 @@
  <!-- Dashboard section --> 
 <main role="main" tabindex="-1" style="max-width: 1100px; margin: 30px auto 0; padding: 0 12px;"> 
   <p id="currentSN" aria-live="polite" aria-atomic="true">
-     Current session is: <b>2023/2024</b> </p> 
+     Current session is: <b><%= current_session.session %>/<%= Number(current_session.session) + 1%></b>-
+     <b><%= current_session.semester %> Semester</b>
+     </p> 
      <p id="welcomeBack" aria-live="polite" aria-atomic="true"> Welcome back <b>Admin</b>! </p>
 <section class="dashs" aria-label="Quick access dashboard links">
   <article

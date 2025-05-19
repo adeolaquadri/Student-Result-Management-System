@@ -54,37 +54,11 @@
         aria-expanded="false"
         aria-controls="session-menu"
       >
-        Session <i class="fa fa-caret-down" aria-hidden="true"></i>
+            Session <i class="fa fa-caret-down" aria-hidden="true"></i>
 </button>
 <div class="dropdown-content" id="session-menu" role="menu">
-<a href="/admin/add_session" role="menuitem" tabindex="-1" >Add session</a >
-<a href="/admin/manage_session" role="menuitem" tabindex="-1" >Manage session</a >
+<a href="/admin/manage_session" role="menuitem" tabindex="-1" >Manage Academic Session</a >
 </div>
-</div>
-<!-- Semester -->
-<div
-  class="dropdown"
-  tabindex="0"
-  aria-haspopup="true"
-  aria-expanded="false"
-  aria-label="Semester menu"
->
-  <button
-    class="dropbtn"
-    aria-haspopup="true"
-    aria-expanded="false"
-    aria-controls="semester-menu"
-  >
-    Semester <i class="fa fa-caret-down" aria-hidden="true"></i>
-  </button>
-  <div class="dropdown-content" id="semester-menu" role="menu">
-    <a href="/admin/add_semester" role="menuitem" tabindex="-1"
-      >Add semester</a
-    >
-    <a href="/admin/manage_semester" role="menuitem" tabindex="-1"
-      >Manage semester</a
-    >
-  </div>
 </div>
 
 <!-- Result -->
@@ -189,7 +163,7 @@
 
   <div class="filter-box">
     <label for="searchInput">Filter courses:</label>
-    <input type="text" id="searchInput" placeholder="Search for courses..." onkeyup="filterTable()">
+    <input type="text" id="searchInput" placeholder="Search for courses...">
   </div>
 
   <table id="coursesData">
@@ -207,9 +181,8 @@
     </thead>
     <tbody>
       <% result.forEach((res, index) => { %>
-        <tr>
+        <tr data-id="<%=res.id %>">
           <td contenteditable="false" data-column="id"><%= index + 1 %></td>
-          <input type="hidden" value="<%=res.id %>" id="data_id">
           <td contenteditable="true" data-column="courseId"><%= res.COURSE_ID %></td>
           <td contenteditable="true" data-column="courseTitle"><%= res.COURSE_TITLE %></td>
           <td contenteditable="true" data-column="courseUnit"><%= res.COURSE_UNIT %></td>
@@ -217,8 +190,8 @@
           <td contenteditable="true" data-column="department"><%= res.DEPARTMENT %></td>
           <td contenteditable="true" data-column="level"><%= res.LEVEL %></td>
           <td class="action-buttons">
-            <button class="updatebtn">Update <i class="fa fa-edit"></i></button>
-            <button class="deletebtn">Delete <i class="fa fa-trash-o"></i></button>
+            <button class="updatebtn">Update</button>
+            <button class="deletebtn">Delete</button>
           </td>
         </tr>
       <% }) %>
@@ -282,8 +255,11 @@
     tableBody.addEventListener('click', (e) => {
       if (e.target.closest('.updatebtn')) {
         const row = e.target.closest('tr');
+        const id = row?.dataset?.id;
+        if(!id) return;
+
         const data = {
-          id: document.getElementById('data_id').value,
+          id: id,
           courseId: row.cells[1].innerText,
           courseTitle: row.cells[2].innerText,
           courseUnit: row.cells[3].innerText,
@@ -297,13 +273,9 @@
       } else if (e.target.closest('.deletebtn')) {
         const row = e.target.closest('tr');
         const data = {
-          id: document.getElementById('data_id').value,
-          courseId: row.cells[1].innerText,
-          semester: row.cells[4].innerText,
-          department: row.cells[5].innerText,
-          level: row.cells[6].innerText,
+          id: row?.dataset?.id,
         };
-        if (confirm("Are you sure you want to delete this course?")) {
+        if (confirm(`Are you sure you want to delete this course ${data.id}`)) {
           deleteCourse(data);
         }
       }

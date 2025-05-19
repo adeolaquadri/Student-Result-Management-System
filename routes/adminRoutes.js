@@ -9,6 +9,7 @@ const multer = require('multer')
 const router = express.Router();
 const util = require('util');
 const query = util.promisify(dbConnection.query).bind(dbConnection);
+const path = require('path');
 
 //CSV file upload storage
 let storage = multer.diskStorage({
@@ -96,113 +97,34 @@ router.get('/dashboard', async (req, res) => {
     // Run all queries in parallel
     const [
       students,
-      academic,
-      courses,
-      department,
-      results,
-      admin
-    ] = await Promise.all([
-      query('SELECT * FROM student'),
-      query('SELECT * FROM academic'),
-      query('SELECT DISTINCT COURSE_ID FROM course_table'),
-      query('SELECT DISTINCT Department FROM student'),
-      query('SELECT * FROM student_result'),
-      query('SELECT * FROM admin_table')
-    ]);
-    res.render('admin/admin', {
-      students,
-      academic,
       courses,
       department,
       results,
       admin,
+      session
+    ] = await Promise.all([
+      query('SELECT * FROM student'),
+      query('SELECT DISTINCT COURSE_ID FROM course_table'),
+      query('SELECT DISTINCT Department FROM student'),
+      query('SELECT * FROM student_result'),
+      query('SELECT * FROM admin_table'),
+      query('SELECT * FROM academic_sessions WHERE is_current = TRUE LIMIT 1')
+    ]);
+    res.render('admin/admin', {
+      students,
+      courses,
+      department,
+      results,
+      admin,
+      current_session: session[0],
       username: verify.username
     });
   } catch (err) {
     console.error(err);
-    res.status(500).send(err.message);
   }
 });
 
 
-//Get: Admin Update Academic Session
-router.get('/update_session', (req, res)=>{
-    if(req.cookies.admin) return res.render('admin/update_session', {message:"", alert:"", style:""});
-    return res.redirect('/admin');
-});
-
-
-//Put: Admin update academic session
-router.put('/update_session', async (req, res) => {
-  if (!req.cookies.admin) {
-    return res.redirect('/admin');
-  }
-  try {
-    jwt.verify(req.cookies.admin, process.env.admin_secret_key);
-
-    if (!req.body.session) {
-      return res.status(400).render('admin/update_session', {
-        message: 'Session value is required',
-        alert: 'alert alert-warning',
-        style: "font-size: 18px; font-family: calibri; background-color: rgba(248, 204, 2, 0.42); padding: 10px; width: 100%; justify-content: center; border-radius: 5px;"
-      });
-    }
-
-    await query('UPDATE academic SET Session = ?', [req.body.session]);
-
-    res.render('admin/update_session', {
-      message: 'Academic Session Updated Successfully',
-      alert: 'alert alert-info',
-      style: "font-size: 18px; font-family: calibri; background-color: rgba(37, 164, 248, 0.42); padding: 10px; width: 100%; justify-content: center; border-radius: 5px;"
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).render('admin/update_session', {
-      message: 'Error updating session: ' + err.message,
-      alert: 'alert alert-danger',
-      style: "font-size: 18px; font-family: calibri; background-color: rgba(248, 2, 2, 0.42); padding: 10px; width: 100%; justify-content: center; border-radius: 5px;"
-    });
-  }
-});
-
-
-
-//Get: Admin Update Academic Semester
-router.get('/update_semester', (req, res)=>{
-    if(req.cookies.admin){
-        res.render('admin/update_semester', {message:"", alert:"", style:""})
-    }else{
-        res.redirect('/admin')
-    }
-})
-
-
-//Put: Admin update academic semester
-router.put('/update_semester', async(req, res)=>{
-    try{
-    if(!req.cookies.admin) return res.redirect('/admin');
-    
-    const semester = req.body.semester;
-    if (!semester) {
-      return res.status(400).json({ success: false, message: "Semester is required" });
-    }
-   await query('UPDATE academic SET Semester = ?',[req.body.semester], (err)=>{
-        if(err) return res.status(500).json({success: false, message: "Error updating semster.."});
-        return res.status(200).json({success: true, message: "Updated semster successfully"});
-    })
-}catch(err){
-        console.error('Error updating semester:', err);
-    return res.status(500).json({success: false, message: "Error updating semster.."});
-}
-});
-
-//GET: Fetch admin details
-router.get('/getadmin', async(req, res)=>{
-    await query('select * from admin_table', (err, result)=>{
-        if(err) return res.status(500).json({sqlError: err.sqlMessage})
-            return res.status(200).json({admin: result})
-    })
-})
 //GET: Render admin signup page
 router.get('/signup', (req, res)=>{
     res.render('admin/signup')
@@ -404,9 +326,9 @@ router.get('/add_course', (req, res)=>{
 });
 
 //Get: Manage courses
-router.get('/manage_course', async(req, res)=>{
+router.get('/manage_course', (req, res)=>{
     if(!req.cookies.admin) return res.redirect('/admin');
-    await query('select * from course_table', (err, result)=>{
+     dbConnection.query('select * from course_table', (err, result)=>{
         if (err) return res.status(500).send('Internal server error');
         return res.render('admin/manage_course', {result:result})
     })
@@ -438,12 +360,10 @@ router.delete('/delete_course/:id', async (req, res) => {
         if (result.affectedRows === 0) {
             return res.status(404).json({ success: false, message: 'Course not found' });
         }
-
+        console.log(result.affectedRows)
         return res.status(200).json({ success: true, message: 'Course deleted successfully' });
     });
 });
-
-
 
 //Put: Admin update course
 router.put('/update_course/:id', (req, res) => {
@@ -683,40 +603,40 @@ router.put('/change_password', (req, res) => {
     const { oldpassword, newpassword, confirmpassword } = req.body;
 
     if (!req.cookies.admin) {
-      return res.status(401).json({ message: 'Unauthorized' });
+      return res.status(401).json({success: false, message: 'Unauthorized' });
     }
 
     const identity = jwt.verify(req.cookies.admin, process.env.admin_secret_key);
     const username = identity.username;
 
     if (newpassword !== confirmpassword) {
-      return res.status(400).json({ message: 'New password and confirm password do not match' });
+      return res.status(400).json({success: false, message: 'New password and confirm password do not match' });
     }
 
     dbConnection.query('SELECT * FROM admin_table WHERE username = ?', [username], (err, result) => {
-      if (err) return res.status(500).json({ message: 'Database error' });
+      if (err) return res.status(500).json({success: false, message: 'Database error' });
 
       if (result.length !== 1) {
-        return res.status(404).json({ message: 'Admin user not found' });
+        return res.status(404).json({success: false, message: 'Admin user not found' });
       }
 
       const matchPassword = bcrypt.compareSync(oldpassword, result[0].password);
       if (!matchPassword) {
-        return res.status(401).json({ message: 'Old password is incorrect' });
+        return res.status(401).json({success: false, message: 'Old password is incorrect' });
       }
 
       const hashPassword = bcrypt.hashSync(newpassword, 10);
       const updateQuery = 'UPDATE admin_table SET password = ? WHERE username = ?';
 
       dbConnection.query(updateQuery, [hashPassword, username], (err) => {
-        if (err) return res.status(500).json({ message: 'Failed to update password' });
+        if (err) return res.status(500).json({success: false, message: 'Failed to update password' });
 
-        return res.status(200).json({ message: 'Password updated successfully' });
+        return res.status(200).json({success: true, message: 'Password updated successfully' });
       });
     });
   } catch (e) {
     console.error(e);
-    return res.status(500).json({ message: 'Internal server error' });
+    return res.status(500).json({success: false, message: 'Internal server error' });
   }
 });
 
@@ -785,7 +705,8 @@ router.put('/reset-password', async (req, res) => {
 router.post('/upload_courses', upload.single('file'), (req, res) => {
   if (!req.cookies.admin) return res.redirect('/admin');
 
-  const filePath = path.join(__dirname, 'uploads', req.file.filename);
+  const filePath = path.join(__dirname, '../uploads', req.file.filename);
+
 
   uploadCoursesCsv(filePath)
     .then(result => {
@@ -884,5 +805,53 @@ router.get('/student-report/', async (req, res) => {
         res.status(500).json({ error: "Error generating report" });
     }
 });
+
+//run query
+router.get('/academic', (req, res)=>{
+  let query = "ALTER TABLE academic_sessions ADD COLUMN is_current BOOLEAN DEFAULT FALSE;"
+  dbConnection.query(query, (err, success)=>{
+    if(err)throw err;
+    console.log(success);
+    return res.status(201).json({message: "Successful"})
+  })
+})
+
+//GET: Academic session
+router.get('/manage_session', async (req, res) => {
+  try {
+    dbConnection.query('SELECT * FROM academic_sessions ORDER BY created_at DESC', (err, rows)=>{
+      if(err)throw err;
+      res.render('admin/manage_session', { records: rows });
+    })
+    // const [rows] = await query('SELECT * FROM academic_sessions ORDER BY created_at DESC');
+    // res.render('admin/manage_session', { records: rows });
+  } catch (err) {
+    console.error(err);
+    res.send('Error fetching sessions');
+  }
+});
+
+// POST new session (and optionally mark as current)
+router.post('/add-session', async (req, res) => {
+  const { session, semester, is_current } = req.body;
+  try {
+    if (is_current) {
+      // Unmark all others
+      await query('UPDATE academic_sessions SET is_current = FALSE');
+    }
+
+    await query(
+      'INSERT INTO academic_sessions (session, semester, is_current) VALUES (?, ?, ?)',
+      [session, semester, !!is_current]
+    );
+
+    res.redirect('/admin/manage_session');
+  } catch (err) {
+    console.error(err);
+    res.send('Error adding session');
+  }
+});
+
+
 
 module.exports = router;
