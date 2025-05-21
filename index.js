@@ -7,6 +7,8 @@ const fs = require('fs');
 const path = require('path');
 const multer = require('multer');
 const bcrypt = require('bcryptjs');
+const methodOverride = require('method-override');
+
 
 //setup my server
 const app = express();
@@ -18,6 +20,7 @@ app.listen(port, ()=>console.log(`server is running on port ${port}`));
 app.use(express.urlencoded({extended: false}));
 app.use(express.json());
 app.use(cookieParser());
+app.use(methodOverride('_method'));
 
 //view engine setup
 app.set('views', path.join(__dirname, 'views'));

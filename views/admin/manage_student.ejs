@@ -273,7 +273,7 @@
           sex: row.cells[8].innerText,
           level: row.cells[9].innerText,
         };
-        if (confirm(`Are you sure you want to update student with matric number: '${matric}'`)) {
+        if (confirm(`Are you sure you want to update student with matric number: '${data.matric}'`)) {
           updateCourse(data);
         }
       } else if (e.target.closest('.deletebtn')) {
@@ -281,7 +281,7 @@
         const data = {
           matric: row.cells[1].innerText,
         };
-        if (confirm(`Are you sure you want to delete  student with matric number: '${matric}'`)) {
+        if (confirm(`Are you sure you want to delete student with matric number: '${data.matric}'`)) {
           deleteCourse(data);
         }
       }
@@ -351,17 +351,17 @@
   renderTablePage();
   bindActionButtons();
 
-  // Logout button fix:
-  const logoutBtn = document.querySelector('#logout-btn');
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', (e) => {
-      if (confirm('Are sure you want to logout?')) {
-        fetch('/admin/logout', { method: 'GET' });
-      } else {
-        e.preventDefault();
+  // Logout button:
+   document.getElementById('logout-btn').addEventListener('click', async (e) => {
+      if (confirm('Are you sure you want to logout?')) {
+        try {
+          await fetch('/admin/logout', { method: 'GET' });
+          window.location.href = '/admin';
+        } catch (err) {
+          alert('Logout failed');
+        }
       }
     });
-  }
 });
 </script>
 

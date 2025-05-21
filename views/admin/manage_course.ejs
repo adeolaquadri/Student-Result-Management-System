@@ -206,7 +206,7 @@
 </div>
 
 <footer class="footer">
-  <p>&copy; <span id="cr"></span> FCAHPTIB.</p>
+  <p>&copy; <%= new Date().getFullYear() %> FCAHPTIB.</p>
   <p>Designed by Adeola Quadri A</p>
   <p>Supervised by Dr. Mrs. Olarenwaju O. T.</p>
 </footer>
@@ -345,17 +345,17 @@
   renderTablePage();
   bindActionButtons();
 
-  // Logout button fix:
-  const logoutBtn = document.querySelector('#logout-btn');
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', (e) => {
-      if (confirm('Are sure you want to logout?')) {
-        fetch('/admin/logout', { method: 'GET' });
-      } else {
-        e.preventDefault();
+  // Logout button:
+    document.getElementById('logout-btn').addEventListener('click', async (e) => {
+      if (confirm('Are you sure you want to logout?')) {
+        try {
+          await fetch('/admin/logout', { method: 'GET' });
+          window.location.href = '/admin';
+        } catch (err) {
+          alert('Logout failed');
+        }
       }
     });
-  }
 });
 </script>
 

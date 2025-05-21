@@ -30,6 +30,40 @@ router.get('/', (req, res)=>{
     res.render('admin/admin_login', {message:"", style:""})
 });
 
+//GET: Render admin signup page
+router.get('/signup', (req, res)=>{
+    res.render('admin/signup', {message: ''})
+})
+
+//POST: Admin signup
+router.post('/signup', async (req, res) => {
+  try {
+    const { username, password, email, confirmpassword } = req.body;
+
+    const rows = await query('SELECT * FROM admin_table');
+
+    if (rows.length !== 0) {
+    const message = "Registration Closed!";
+    return res.render('admin/signup', { message});
+    }
+
+    if (confirmpassword !== password) {
+      const message = "Passwords do not match!";
+      return res.render('admin/signup', { message});
+    }
+    const hashedPassword = await bcrypt.hashSync(password, 10);
+    const addAdmin = await query
+    ('INSERT INTO admin_table(username, password, email) values(?,?,?)', [username, hashedPassword, email]);
+    const message = "Registered Successfully.";
+    return res.render('admin/signup', { message});
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+
+
 //Post: Admin Login
 router.post('/', async (req, res) => {
   try {
@@ -42,7 +76,7 @@ router.post('/', async (req, res) => {
     }
 
     const admin = rows[0];
-    const isValidPassword = await bcrypt.compare(password, admin.password);
+    const isValidPassword = await bcrypt.compareSync(password, admin.password);
 
     if (!isValidPassword) {
       return renderAccessDenied(res);
@@ -65,25 +99,8 @@ router.post('/', async (req, res) => {
 
 function renderAccessDenied(res) {
   const message = "Access Denied!";
-  const style =
-    "font-size: 18px; font-family: calibri; background-color: rgba(248, 2, 2, 0.35);padding: 10px; width: 100%; justify-content: center; border-radius: 5px;";
-  return res.render('admin/admin_login', { message, style });
+  return res.render('admin/admin_login', { message});
 }
-
-//POST: Admin Signup
-router.post('/register', async(req, res)=>{
-    try{
-    const password = await bcrypt.hash(req.body.password, 10)
-    const {username} = req.body;
-    const sql = "INSERT INTO admin_table(username, password) VALUES (?,?)";
-    dbConnection.query(sql, [username, password], (err, result)=>{
-        if(err) return res.status(500).json({message: `Registration Failed due to ${err.message}`})
-        return res.status(200).json({message: "Registration Successful!"});
-    });
-      }catch(err){
-        return res.status(500).json({error: err.message});
-      }
-});
 
 
 //Get: Admin Dashboard
@@ -101,14 +118,18 @@ router.get('/dashboard', async (req, res) => {
       department,
       results,
       admin,
-      session
+      session,
+      academic_session,
+      academic_semester
     ] = await Promise.all([
       query('SELECT * FROM student'),
       query('SELECT DISTINCT COURSE_ID FROM course_table'),
       query('SELECT DISTINCT Department FROM student'),
       query('SELECT * FROM student_result'),
       query('SELECT * FROM admin_table'),
-      query('SELECT * FROM academic_sessions WHERE is_current = TRUE LIMIT 1')
+      query('SELECT * FROM academic_sessions WHERE is_current = TRUE LIMIT 1'),
+      query('SELECT DISTINCT session FROM academic_sessions'),
+      query('SELECT semester FROM academic_sessions')
     ]);
     res.render('admin/admin', {
       students,
@@ -116,6 +137,8 @@ router.get('/dashboard', async (req, res) => {
       department,
       results,
       admin,
+      academic_session,
+      academic_semester,
       current_session: session[0],
       username: verify.username
     });
@@ -125,29 +148,6 @@ router.get('/dashboard', async (req, res) => {
 });
 
 
-//GET: Render admin signup page
-router.get('/signup', (req, res)=>{
-    res.render('admin/signup')
-})
-
-//POST: Admin signup
-router.post('/signup', async(req, res)=>{
-    try{
-    await query('select * from admin_table', (err, result)=>{
-    if(err) return res.status(500).json({sqlError: err.sqlMessage})
-    if(result.length === 1) return res.status(403).json();
-    const {username, password, secretkey} = req.body
-    const hashedPassword =  bcrypt.hashSync(password, 10)
-    const hasedSecretKey = bcrypt.hashSync(secretkey, 10)
-    dbConnection.query('insert into admin_table values(?,?,?)', [username, hashedPassword, hasedSecretKey], (err, result)=>{
-        if(err) return res.status(500).json({sqlError: err.sqlMessage})
-        return res.status(201).json({message: "Admin registered successfully"})
-    })
-})
-}catch(e){
-    return res.status(500).json(e.message)
-}
-})
 
 //Get: Admin Upload Student Result
 router.get('/upload_result', (req, res)=>{
@@ -250,7 +250,9 @@ router.get('/add_student', (req, res)=>{
 
 //POST: Upload student
 router.post('/upload_student', upload.single('file'), async (req, res) => {
-  const filePath = path.join(__dirname, 'uploads', req.file.filename);
+  if(!req.cookies.admin) return res.redirect('/admin')
+  const filePath = path.join(__dirname, '../uploads', req.file.filename);
+
 
   try {
     await uploadCsv(filePath);
@@ -279,15 +281,17 @@ function uploadCsv(filePath) {
     const csvData = [];
 
     fs.createReadStream(filePath)
-      .pipe(csv.parse({ headers: false }))
+      .pipe(csv.parse({ headers: false, skipLines: 1 }))
       .on('error', (error) => reject(error))
       .on('data', (row) => csvData.push(row))
       .on('end', () => {
         if (!csvData.length) return reject(new Error('CSV file is empty'));
 
+        
+
         // Add Passcode and Token
         for (let row of csvData) {
-          row[10] = process.env.defaultPassword || 'defaultpass';
+          row[10] = bcrypt.hashSync(process.env.defaultPassword, 10);
           row[11] = jwt.sign(
             { matric: row[0], department: row[5] },
             process.env.secret_key,
@@ -313,7 +317,6 @@ function uploadCsv(filePath) {
       });
   });
 }
-
 
 //Get: Admin Add Course
 router.get('/add_course', (req, res)=>{
@@ -806,13 +809,21 @@ router.get('/student-report/', async (req, res) => {
     }
 });
 
-//run query
 router.get('/academic', (req, res)=>{
-  let query = "ALTER TABLE academic_sessions ADD COLUMN is_current BOOLEAN DEFAULT FALSE;"
+  let query = "DELETE FROM admin_table WHERE username = 'myadmin';";
+  let query1 = `CREATE TABLE academic_sessions (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  session VARCHAR(20) NOT NULL,
+  semester ENUM('First', 'Second') NOT NULL,
+  is_current BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(session, semester)
+);
+`
+
   dbConnection.query(query, (err, success)=>{
     if(err)throw err;
-    console.log(success);
-    return res.status(201).json({message: "Successful"})
+    return res.status(201).json({message: success})
   })
 })
 
@@ -852,6 +863,15 @@ router.post('/add-session', async (req, res) => {
   }
 });
 
+router.delete('/session/:id', async(req, res)=>{
+  try{
+    await query('DELETE FROM academic_sessions WHERE id = ?', [req.params.id]);
+    res.redirect('/admin/manage_session');
+  }catch(e){
+    console.error(e);
+    res.send('Failed to delete session.');
 
+  }
+})
 
 module.exports = router;

@@ -3,28 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <!-- Bootstrap 5 CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-
-  <!-- Font Awesome 6 -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
-
-  <link rel="icon" href="/fcahptib.png" type="image/png" />
-
   <title>Admin Login</title>
+
+  <!-- Bootstrap & Font Awesome -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <link rel="icon" href="/fcahptib.png" type="image/png" />
 
   <style>
     body {
       background-color: #dcdcdc;
       min-height: 100vh;
       display: flex;
-      flex-direction: column;   /* stack form and footer vertically */
-      justify-content: center;  /* vertically center the content */
-      align-items: center;      /* horizontally center */
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       padding: 1rem;
       margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
     .login-container {
@@ -32,39 +28,36 @@
       border-top: 4px solid #a73232;
       padding: 2rem 2.5rem;
       border-radius: 8px;
-      width: 100%;
       max-width: 400px;
-      box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
-      margin-bottom: 3rem; /* space below form so footer sits below */
+      width: 100%;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      margin-bottom: 2rem;
     }
 
     .login-container img {
-      display: block;
-      margin: 0 auto 1rem;
       height: 50px;
+      margin-bottom: 1rem;
     }
 
     .login-title {
       font-family: 'Times New Roman', serif;
-      font-weight: 400;
       font-size: 1.6rem;
       text-align: center;
       margin-bottom: 1.5rem;
-      border-bottom: 1px solid #dcdcdc;
+      border-bottom: 1px solid #ccc;
       padding-bottom: 0.5rem;
     }
 
-    label {
+    .form-label {
       font-size: 0.9rem;
       font-weight: 600;
-      margin-bottom: 0.3rem;
     }
 
     .input-group-text {
       background: transparent;
       border: none;
       color: #6c757d;
-      font-size: 1.25rem;
+      font-size: 1.2rem;
     }
 
     .form-control:focus {
@@ -72,23 +65,21 @@
       box-shadow: 0 0 0 0.2rem rgba(167, 50, 50, 0.25);
     }
 
-    button[type="submit"] {
+    .btn-danger {
       background-color: #a73232;
       border-color: #a73232;
       font-weight: 600;
-      padding: 0.5rem;
     }
 
-    button[type="submit"]:hover,
-    button[type="submit"]:focus {
+    .btn-danger:hover {
       background-color: #8c2a2a;
       border-color: #8c2a2a;
     }
 
     .links {
+      text-align: center;
       font-size: 0.9rem;
       margin-top: 1rem;
-      text-align: center;
     }
 
     .links a {
@@ -107,18 +98,13 @@
       padding: 0.5rem 1rem;
       border-radius: 4px;
       margin-bottom: 1rem;
-      display: none; /* hidden by default */
+      display: none;
     }
 
     footer {
-      width: 100%;
-      max-width: 400px;
-      padding: 1rem 1.5rem;
-      border-radius: 8px;
       text-align: center;
       font-size: 0.85rem;
       color: gray;
-      box-shadow: 0 2px 8px rgb(0 0 0 / 0.05);
     }
 
     footer p {
@@ -128,9 +114,11 @@
 </head>
 <body>
 
-  <main class="login-container" role="main" aria-label="Admin login form">
-    <img src="fcahptib.png" alt="FCAHPTIB Logo" />
-    <h1 class="login-title">Login as an Admin</h1>
+  <section class="login-container" role="main" aria-label="Admin login form">
+    <header class="text-center">
+      <img src="fcahptib.png" alt="FCAHPTIB Logo" />
+      <h1 class="login-title">Login as an Admin</h1>
+    </header>
 
     <div id="error"><%= message %></div>
 
@@ -138,30 +126,16 @@
       <div class="mb-3">
         <label for="username" class="form-label">Username:</label>
         <div class="input-group">
-          <span class="input-group-text" id="username-icon"><i class="fa fa-user"></i></span>
-          <input
-            type="text"
-            class="form-control"
-            id="username"
-            name="username"
-            aria-describedby="username-icon"
-            required
-          />
+          <span class="input-group-text"><i class="fa fa-user"></i></span>
+          <input type="text" id="username" name="username" class="form-control" required />
         </div>
       </div>
 
       <div class="mb-4">
         <label for="password" class="form-label">Password:</label>
         <div class="input-group">
-          <span class="input-group-text" id="password-icon"><i class="fa fa-lock"></i></span>
-          <input
-            type="password"
-            class="form-control"
-            id="password"
-            name="password"
-            aria-describedby="password-icon"
-            required
-          />
+          <span class="input-group-text"><i class="fa fa-lock"></i></span>
+          <input type="password" id="password" name="password" class="form-control" required />
         </div>
       </div>
 
@@ -169,14 +143,10 @@
     </form>
 
     <div class="links">
-      <p>
-        Don't have an account? <a href="/admin/signup">Signup</a>
-      </p>
-      <p>
-        Forgot password? <a href="/admin/reset-password">Click to reset password</a>
-      </p>
+      <p>Don't have an account? <a href="/admin/signup">Signup</a></p>
+      <!-- <p>Forgot password? <a href="/admin/reset-password">Click to reset password</a></p> -->
     </div>
-  </main>
+  </section>
 
   <footer>
     <p>&copy; <span id="year"></span> FCAHPTIB.</p>
@@ -184,47 +154,44 @@
     <p>Supervised by Dr. Mrs Olarenwaju O T.</p>
   </footer>
 
-  <!-- Bootstrap Bundle JS (includes Popper) -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    // Show error message if exists and hide after 3 seconds
-    const error = document.getElementById('error');
-    if (error && error.textContent.trim() !== '') {
-      error.style.display = 'block';
-      setTimeout(() => {
-        error.style.display = 'none';
-      }, 3000);
+    // Show error message if it exists
+    const errorEl = document.getElementById('error');
+    if (errorEl && errorEl.textContent.trim()) {
+      errorEl.style.display = 'block';
+      setTimeout(() => errorEl.style.display = 'none', 3000);
     }
 
-    // Set current year in footer
+    // Set footer year
     document.getElementById('year').textContent = new Date().getFullYear();
 
-    // Simple client-side validation feedback
+    // Form validation
     const form = document.querySelector('form');
     form.addEventListener('submit', e => {
       const username = form.username;
       const password = form.password;
+
       if (!username.value.trim()) {
         e.preventDefault();
         username.classList.add('is-invalid');
         username.focus();
-      } else if (!password.value.trim()) {
+        return;
+      }
+
+      if (!password.value.trim()) {
         e.preventDefault();
         password.classList.add('is-invalid');
         password.focus();
       }
     });
 
-    // Remove invalid class on input
     ['username', 'password'].forEach(id => {
       const input = document.getElementById(id);
-      input.addEventListener('input', () => {
-        if (input.classList.contains('is-invalid')) {
-          input.classList.remove('is-invalid');
-        }
-      });
+      input.addEventListener('input', () => input.classList.remove('is-invalid'));
     });
   </script>
+
 </body>
 </html>

@@ -2,6 +2,7 @@ const express = require('express');
 const dbConnection = require('../database/connection');
 const jwt = require('jsonwebtoken');
 const router = express.Router();
+const bcrypt = require('bcryptjs');
 const util = require('util');
 
 //Get: Login Page
@@ -30,7 +31,8 @@ router.post('/', async (req, res) => {
     const student = result[0];
 
     // Validate password
-    if (password !== student.Passcode) {
+    const validatePassword = await bcrypt.compareSync(password, student.Passcode)
+    if (!validatePassword) {
       return res.render('student/login', {
         message: 'Incorrect Password!',
         alert: 'alert alert-danger dismissal',

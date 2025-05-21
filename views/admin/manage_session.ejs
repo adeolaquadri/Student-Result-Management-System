@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Manage Academic Session</title>
   <link rel="stylesheet" href="/css/admin.css" />
+   <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+  />
+  <link rel="icon" type="image/png" href="/fcahptib.png" />
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 30px;
-    }
-
     h2 {
       color: #7f2525;
       text-align: center;
@@ -39,7 +39,7 @@
       border-radius: 4px;
     }
 
-    button {
+    form button {
       padding: 10px;
       background: #a73232;
       color: white;
@@ -252,9 +252,9 @@
           <tr>
             <td><%= r.session %></td>
             <td><%= r.semester %></td>
-            <td><%= new Date(r.createdAt).toLocaleDateString() %></td>
+            <td><%= new Date(r.createdAt).toDateString() %></td>
             <td class="actions">
-              <form action="/admin/session/<%= r._id %>?_method=DELETE" method="POST" style="display:inline;">
+              <form action="/admin/session/<%= r.id %>?_method=DELETE" method="POST" style="display:inline;">
                 <button type="submit">Delete</button>
               </form>
             </td>
@@ -265,5 +265,22 @@
   <% } else { %>
     <p style="text-align:center;">No academic session added yet.</p>
   <% } %>
+  <footer class="footer">
+  <p>&copy; <%= new Date().getFullYear() %> FCAHPTIB.</p>
+  <p>Designed by Adeola Quadri A</p>
+  <p>Supervised by Dr. Mrs. Olarenwaju O. T.</p>
+</footer>
+  <script>
+      document.getElementById('logout-btn').addEventListener('click', async (e) => {
+      if (confirm('Are you sure you want to logout?')) {
+        try {
+          await fetch('/admin/logout', { method: 'GET' });
+          window.location.href = '/admin';
+        } catch (err) {
+          alert('Logout failed');
+        }
+      }
+    });
+    </script>
 </body>
 </html>

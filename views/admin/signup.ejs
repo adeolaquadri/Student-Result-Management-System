@@ -1,142 +1,232 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <link rel="page icon" type="icon" href="/fcahptib.png">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" 
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <script src="/jquery-3.7.1.min.js"></script>
-    <title>Admin Signup</title>
-    <style>
-        *{
-            margin: 0;
-            box-sizing: border-box;
-        }
-        body{
-            background-color: gainsboro;
-        }
-        .form{
-            margin: auto;
-            height: fit-content;
-            width: fit-content;
-            margin-top: 5%;
-            background: #fff;
-            padding: 1%;
-            border-top: 3px solid rgb(167, 50, 50);
-            /* border-bottom: 3px solid rgb(167, 50, 50); */
-        }
-        label{
-            font-size: 14px;
-            font-family: calibri;
-        }
-        input{
-            outline: none;
-            border: none;
-            border: 1px solid black;
-            border-radius: 1px;
-            width: 200px;
-            padding: 3%;
-        }
-        button{
-            width: 100%;
-            font-size: 16px;
-            font-family: calibri;
-            outline: none;
-            border: none;
-            padding: 5px;
-            cursor: pointer;
-            background-color: rgb(167, 50, 50);
-            border: transparent;
-            border-radius: 5px;
-            color: #fff;
-        }
-        h3{
-            font-size: 22px;
-            font-family: 'Times New Roman', Times, serif;
-            font-weight: 400;
-            text-align: center;
-            border-bottom: 1pt solid gainsboro;
-        }
-        .footer{
-            display: flex;
-            justify-content: center;
-            padding: 2%;
-}
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <!-- Font Awesome 6 -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+
+  <link rel="icon" href="/fcahptib.png" type="image/png" />
+  <title>Admin Signup</title>
+
+  <style>
+    body {
+      background-color: #dcdcdc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .login-container {
+      background: #fff;
+      border-top: 4px solid #a73232;
+      padding: 2rem 2.5rem;
+      border-radius: 8px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
+      margin-bottom: 3rem;
+    }
+
+    .login-container img {
+      display: block;
+      margin: 0 auto 1rem;
+      height: 50px;
+    }
+
+    .login-title {
+      font-family: 'Times New Roman', serif;
+      font-weight: 400;
+      font-size: 1.6rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid #dcdcdc;
+      padding-bottom: 0.5rem;
+    }
+
+    label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+
+    .input-group-text {
+      background: transparent;
+      border: none;
+      color: #6c757d;
+      font-size: 1.25rem;
+    }
+
+    .form-control:focus {
+      border-color: #a73232;
+      box-shadow: 0 0 0 0.2rem rgba(167, 50, 50, 0.25);
+    }
+
+    button[type="submit"] {
+      background-color: #a73232;
+      border-color: #a73232;
+      font-weight: 600;
+      padding: 0.5rem;
+    }
+
+    button[type="submit"]:hover,
+    button[type="submit"]:focus {
+      background-color: #8c2a2a;
+      border-color: #8c2a2a;
+    }
+
+    .links {
+      font-size: 0.9rem;
+      margin-top: 1rem;
+      text-align: center;
+    }
+
+    .links a {
+      color: #a73232;
+      text-decoration: none;
+    }
+
+    .links a:hover {
+      text-decoration: underline;
+    }
+
+    #error {
+      color: #b02a37;
+      background-color: #f8d7da;
+      border: 1px solid #f5c2c7;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+      display: none;
+    }
+
+    footer {
+      width: 100%;
+      max-width: 400px;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 0.85rem;
+      color: gray;
+      box-shadow: 0 2px 8px rgb(0 0 0 / 0.05);
+    }
+
+    footer p {
+      margin: 0.2rem 0;
+    }
+  </style>
 </head>
 <body>
-    <div class="form">
-        <center><img src="fcahptib.png" alt="" height="50"></center>
-        <h3>Register as an Admin </h3><br><br>
-            <label for="">Username:</label><br>
-            <div class="studentID" style="border: 1px solid black;">
-                <i class="fa fa-fw fa-user" style="font-size: 23px; color: #00000091;"></i>
-                <input type="text" name="username" id="username" style="border: none;" required />
-            </div><br>
 
-            <label for="">Password:</label><br>
-            <div class="studentID" style="border: 1px solid black;">
-                <i class="fa fa-fw fa-lock" style="font-size: 23px;color:#00000091;"></i>
-                <input type="password" placeholder="*******************" name="password" id="password" style="border: none;" required />
-            </div><br>
+  <main class="login-container" role="main" aria-label="Admin signup form">
+    <img src="/fcahptib.png" alt="FCAHPTIB Logo" />
+    <h1 class="login-title">Admin Signup</h1>
 
-            <label for="">Secret Key:</label><br>
-            <div class="studentID" style="border: 1px solid black;">
-                <i class="fa fa-fw fa-lock" style="font-size: 23px;color:#00000091;"></i>
-                <input type="password" placeholder="*******************" name="password" id="secretkey" style="border: none;" required />
-            </div><br>
-            <button id="signup">Signup</button><br>
-            <br><span>Already an exist admin? <a href="/admin">Sign in</a></span>
-    </div>
-    <div class="footer">
-        <footer>
-          <p style="font-size: 15px; text-align: center;
-          font-style: normal; color: gray;"> &copy; <span id="cr"></span> FCAHPTIB.</p>
-          <p style="font-size: 14px; text-align: center;
-          font-style: normal; color: gray;">Designed by Adeola Quadri. A</p>
-          <p style="font-size: 14px; text-align: center;
-          font-style: normal; color: gray;">Supervised by Dr. Mrs Olarenwaju O T.</p>
-       </footer>
+    <div id="error"><%= message %></div>
+
+    <form action="/admin/signup" method="post" novalidate>
+      <div class="mb-3">
+        <label for="username" class="form-label">Username:</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="fa fa-user"></i></span>
+          <input type="text" class="form-control" id="username" name="username" required />
         </div>
-        
-    <script>
-      let date = new Date
-      document.getElementById("cr").innerHTML = date.getFullYear();
+      </div>
 
-document.querySelector('#signup').addEventListener('click', ()=>{   
-const username = document.getElementById("username").value;
-const password = document.getElementById("password").value;
-const secretkey = document.getElementById("secretkey").value;
+      <div class="mb-3">
+        <label for="email" class="form-label">Email:</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+          <input type="email" class="form-control" id="email" name="email" required />
+        </div>
+      </div>
 
-const data = {
-  username: username,
-  password: password,
-  secretkey: secretkey
-};
-signup(data)
-});
+      <div class="mb-4">
+        <label for="password" class="form-label">Password:</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="fa fa-lock"></i></span>
+          <input type="password" class="form-control" id="password" name="password" required />
+        </div>
+      </div>
 
-function signup(data){
-fetch('/admin/signup', {
-  method: 'POST',
-  headers:{
-    'Content-Type': 'application/json',
-  },
-  body:JSON.stringify(data)
-})
-.then(response => {response.json();
-  if(response.status === 201){
-    alert(`Admin created Successfully!`);
-  }else if(response.status === 403){
-    alert('Admin already exist! Registration closed.');
-  }else{
-    alert('Error registering admin...');
-  }
-  })
-}
-    </script>
+       <div class="mb-5">
+        <label for="confirmpassword" class="form-label">Confirm Password:</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="fa fa-lock"></i></span>
+          <input type="password" class="form-control" id="confirmpassword" name="confirmpassword" required />
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-danger w-100">Signup</button>
+    </form>
+
+    <div class="links">
+      <p>Already have an account? <a href="/admin">Login</a></p>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; <span id="year"></span> FCAHPTIB.</p>
+    <p>Designed by Adeola Quadri. A</p>
+    <p>Supervised by Dr. Mrs Olarenwaju O T.</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    const error = document.getElementById('error');
+    if (error && error.textContent.trim() !== '') {
+      error.style.display = 'block';
+      setTimeout(() => {
+        error.style.display = 'none';
+      }, 3000);
+    }
+
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const form = document.querySelector('form');
+    form.addEventListener('submit', e => {
+      const username = form.username;
+      const email = form.email;
+      const password = form.password;
+      const confirmpassword = form.confirmpassword;
+
+      if (!username.value.trim()) {
+        e.preventDefault();
+        username.classList.add('is-invalid');
+        username.focus();
+      } else if (!email.value.trim()) {
+        e.preventDefault();
+        email.classList.add('is-invalid');
+        email.focus();
+      } else if (!password.value.trim()) {
+        e.preventDefault();
+        password.classList.add('is-invalid');
+        password.focus();
+      } else if (!confirmpassword.value.trim()) {
+        e.preventDefault();
+        confirmpassword.classList.add('is-invalid');
+        confirmpassword.focus();
+      }
+    });
+
+    ['username', 'email', 'password', 'confirmpassword'].forEach(id => {
+      const input = document.getElementById(id);
+      input.addEventListener('input', () => {
+        if (input.classList.contains('is-invalid')) {
+          input.classList.remove('is-invalid');
+        }
+      });
+    });
+  </script>
 </body>
 </html>

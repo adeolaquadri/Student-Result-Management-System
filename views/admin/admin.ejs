@@ -214,7 +214,7 @@
     onclick="location.href='/admin/manage_semester'"
     onkeypress="if(event.key==='Enter' || event.key===' ') location.href='/admin/manage_semester';"
   >
-    <p>2</p>
+    <p><%= academic_semester.length %></p>
     <p>Semesters</p>
     <i class="fa fa-calendar" aria-hidden="true"></i>
     <p id="descSemester" hidden>Manage academic semesters</p>
@@ -228,7 +228,7 @@
     onclick="location.href='/admin/manage_session'"
     onkeypress="if(event.key==='Enter' || event.key===' ') location.href='/admin/manage_session';"
   >
-    <p>1</p>
+    <p><%= academic_session.length %></p>
     <p>Sessions</p>
     <i class="fa fa-clock-o" aria-hidden="true"></i>
     <p id="descSession" hidden>Manage academic sessions</p>
@@ -273,7 +273,8 @@
   button.setAttribute('aria-expanded', false);
    menu.style.display = 'none'; 
   } }); });
-  // Logout button example: replace with your logout logic
+  
+  // Logout button
    const logoutBtn = document.getElementById('logout-btn');
    logoutBtn.addEventListener('click', () => { 
   if (confirm('Are you sure you want to logout?')) {

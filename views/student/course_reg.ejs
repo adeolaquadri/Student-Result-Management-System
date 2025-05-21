@@ -244,7 +244,7 @@
 
     <header class="session-info" style="margin-bottom: 1rem;">
       Course Registration — 
-      <span><%= session %></span> / <span><%= session2 %></span> — 
+      <span><%= session %></span> / <span><%= Number(session) + 1%></span> — 
       <span style="text-transform: capitalize;"><%= semester %> Semester</span>
     </header>
 
@@ -273,9 +273,9 @@
               <% courses.forEach((course, i) => { %>
                 <tr>
                   <td><%= i + 1 %></td>
-                  <td><%= course.code %></td>
-                  <td><%= course.title %></td>
-                  <td><%= course.unit %></td>
+                  <td><%= course.COURSE_ID %></td>
+                  <td><%= course.COURSE_TITLE %></td>
+                  <td><%= course.COURSE_UNIT %></td>
                   <td class="text-center">
                     <input 
                       type="checkbox" 

@@ -180,7 +180,7 @@
      <div class="footer">
       <footer>
         <p style="font-size: 15px; text-align: center;
-        font-style: normal; color: gray;"> &copy; <span id="cr"></span> FCAHPTIB.</p>
+        font-style: normal; color: gray;"> &copy; <%= new Date().getFullYear() %> FCAHPTIB.</p>
         <p style="font-size: 14px; text-align: center;
         font-style: normal; color: gray;">Designed by Adeola Quadri. A</p>
         <p style="font-size: 14px; text-align: center;
@@ -189,17 +189,16 @@
       </div>
       
     <script>
-        let date = new Date
-        document.getElementById("cr").innerHTML = date.getFullYear();
-        document.querySelector('#logout').addEventListener('click', (e)=>{
-      if(confirm('Are sure you want to logout?') == true){
-       fetch('/admin/logout',{
-       method: 'get'})
-      }else{
-       e.preventDefault()
-   }
-   
-})
+        document.getElementById('logout-btn').addEventListener('click', async (e) => {
+      if (confirm('Are you sure you want to logout?')) {
+        try {
+          await fetch('/admin/logout', { method: 'GET' });
+          window.location.href = '/admin';
+        } catch (err) {
+          alert('Logout failed');
+        }
+      }
+    });
     </script>
 </body>
 </html>
