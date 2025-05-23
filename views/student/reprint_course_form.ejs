@@ -256,11 +256,11 @@
       <tbody>
         <% reprint_courses.forEach(reprint => { %>
           <tr>
-            <td><%= reprint.Session %></td>
-            <td><%= reprint.Semester %></td>
+            <td><%= reprint.session_year %></td>
+            <td><%= reprint.semester %></td>
             <td>
               <button class="reprintbtn" type="button">
-                <a href="Reprint_CourseForm?level=<%= reprint.Level %>&department=<%= encodeURIComponent(department) %>&session=<%= reprint.Session %>&semester=<%= reprint.Semester %>">Reprint course form</a>
+                <a href="Reprint_CourseForm?level=<%= reprint.level %>&department=<%= encodeURIComponent(department) %>&session=<%= reprint.session_year %>&semester=<%= reprint.semester %>">Reprint course form</a>
               </button>
             </td>
           </tr>

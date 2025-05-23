@@ -280,9 +280,10 @@
                     <input 
                       type="checkbox" 
                       name="selectedCourses[]" 
-                      value="<%= course.code %>" 
+                      value="<%=course.COURSE_ID%>" 
                       checked 
                       aria-checked="true"
+                      <%=disabled%>
                     />
                   </td>
                 </tr>
@@ -299,8 +300,8 @@
       </div>
 
       <div class="text-right" style="margin-top: 1rem;">
-        <button type="submit" class="btn btn-success">
-          <i class="fa fa-check"></i> Submit Registration
+        <button type="submit" <%=disabled%> class="btn btn-success">
+          <i class="fa fa-check"></i> <%= message %>
         </button>
       </div>
     </form>
@@ -331,6 +332,15 @@
         fetch('/logout', { method: 'GET' });
       }
     });
+
+  document.querySelector('form').addEventListener('submit', function(e) {
+    const checked = document.querySelectorAll('input[name="selectedCourses[]"]:checked');
+    if (checked.length === 0) {
+      e.preventDefault();
+      alert('Please select at least one course before submitting.');
+    }
+  });
+
   </script>
 </body>
 </html>

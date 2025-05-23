@@ -1,119 +1,133 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-   <meta charset="UTF-8">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Reprint Course Form</title>
-   <style>
-   *{
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reprint Course Form</title>
+  <style>
+    * {
       margin: 0;
-      box-sizing: border-box;
       padding: 0;
-   }
-   .bioTable{
-        width: 100%;
-        /* border: 1px solid; */
-        padding: 5px;
-   }
-   .bioTable td{
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Cambria, serif;
+      padding: 20px;
+    }
+    h2, h3 {
+      text-align: center;
+    }
+    h2 img {
+      display: block;
+      margin: 0 auto 10px;
+    }
+    .bioTable {
+      width: 100%;
+      margin-top: 20px;
+    }
+    .bioTable td {
+      padding: 5px 10px;
       font-size: 16px;
-      font-family: cambria;
-   }
-    .resultTable{
+    }
+    .resultTable {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 5%;
+      margin-top: 30px;
     }
-   .resultTable, .resultTable th, .resultTable td{
-      border: 1px solid;
+    .resultTable th, .resultTable td {
+      border: 1px solid #000;
       padding: 7px;
       text-align: center;
-   }
-   .resultTable td{
+    }
+    .resultTable td {
       font-size: 16px;
-   }
-   .heading{
-      width: 100%;
-      /* border: 1px solid; */
-   }
-   .sub-heading{
-      width: 100%;
-   }
-   .sub-heading, .sub-heading th{
-      /* border: 1px solid; */
-      padding: 2px;
+    }
+    .signature-section {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 40px;
+      padding: 0 20px;
+    }
+    .signature {
       text-align: center;
-   }
-   </style>
+    }
+  </style>
 </head>
 <body>
-      <h2 style="font-size: 18pt; text-align: center;">
-         <center>
-         <img src="/fcahptib.png" height="50" alt=""></center>
-         FEDERAL COLLEGE OF ANIMAL HEALTH AND PRODUCTION TECHNOLOGY, IBADAN.</h2><br>
-          <h3 style="text-align: center;">Student's Course Form</h3><br>
-   <table class="bioTable">
-      <tr>
-          <td><b>Student Name:</b></td><td style="font-family: monospace;"><%=fullname%></td>
-      </tr>
-      <tr>
-          <td><b>Matriculation Number:</b></td><td style="font-family: monospace;"><%=matric %></td>
-      </tr>
-      <tr>
-          <td><b>Course of Study:</b></td><td style="font-family: monospace;"><%=department %></td>
-      </tr>
-      <tr>
-          <td><b>Level:</b></td><td style="font-family: monospace;"><%=level %></td>
-      </tr>
-      <tr>
-         <td><b>Session:</b></td><td style="font-family: monospace;"><%=session %>/<%=Number(session) + 1%></td>
-     </tr>
-     <tr>
-      <td><b>Semester:</b></td><td style="font-family: monospace;"><%=semester %></td>
-  </tr>
-  <!-- <tr>
-   <td><b>Email:</b></td><td style="font-family: monospace;"></td>
-</tr> -->
+  <h2>
+    <img src="/fcahptib.png" height="50" alt="FCAHPTIB Logo" />
+    FEDERAL COLLEGE OF ANIMAL HEALTH AND PRODUCTION TECHNOLOGY, IBADAN.
+  </h2>
+
+  <h3>Student's Course Form</h3>
+
+  <table class="bioTable">
+    <tr>
+      <td><b>Student Name:</b></td>
+      <td style="font-family: monospace;"><%= fullname %></td>
+    </tr>
+    <tr>
+      <td><b>Matriculation Number:</b></td>
+      <td style="font-family: monospace;"><%= matric %></td>
+    </tr>
+    <tr>
+      <td><b>Course of Study:</b></td>
+      <td style="font-family: monospace;"><%= department %></td>
+    </tr>
+    <tr>
+      <td><b>Level:</b></td>
+      <td style="font-family: monospace;"><%= level %></td>
+    </tr>
+    <tr>
+      <td><b>Session:</b></td>
+      <td style="font-family: monospace;"><%= session %>/<%= Number(session) + 1 %></td>
+    </tr>
+    <tr>
+      <td><b>Semester:</b></td>
+      <td style="font-family: monospace;"><%= semester %></td>
+    </tr>
   </table>
 
   <table class="resultTable">
-   <tr>
-   <th>S/N</th>
-   <th>Course Code</th>
-   <th>Course Title</th>
-   <th>Course_Unit</th>
-   <th>Status</th>
-   </tr>
-   <%for(let i = 1; i <= result.length; i++){%>
-   <%result.forEach(res => {%>
-   <tr>
-      <td><%=i++%></td>
-      <td><%=res.COURSE_ID%></td>
-      <td style="text-transform: capitalize;"><%=res.COURSE_TITLE%></td>
-      <td><%=res.COURSE_UNIT%></td>
-      <td>Registered</td>
-   </tr>
-<%})%>
-<%}%>
-<tr>
-   <%total_unit.forEach(tu => {%>
-   <td></td>
-   <td></td>
-   <td style="text-align: right;"><b>Total Unit:</b></td>
-   <td><%=tu.total%></td>
-   <td></td>
-   <%})%>
-   </tr>
-</table>
-<div style="display:flex; gap: 70px; margin-top:20px;">
-<p>____________________<br>HOD's Signature & Date</p>
-<p>____________________<br>Student's Signature & Date</p>
-</div>
-</div>
-</table>
-</div>
-<script>
-   window.print()
-</script>
+    <thead>
+      <tr>
+        <th>S/N</th>
+        <th>Course Code</th>
+        <th>Course Title</th>
+        <th>Course Unit</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% result.forEach((res, index) => { %>
+        <tr>
+          <td><%= index + 1 %></td>
+          <td><%= res.COURSE_ID %></td>
+          <td style="text-transform: capitalize;"><%= res.COURSE_TITLE %></td>
+          <td><%= res.COURSE_UNIT %></td>
+          <td>Registered</td>
+        </tr>
+      <% }); %>
+      <tr>
+        <td colspan="2"></td>
+        <td style="text-align: right;"><b>Total Unit:</b></td>
+        <td><%= total_unit?.total || 0 %></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="signature-section">
+    <div class="signature">
+      ____________________<br>HOD's Signature & Date
+    </div>
+    <div class="signature">
+      ____________________<br>Student's Signature & Date
+    </div>
+  </div>
+
+  <script>
+    window.print();
+  </script>
 </body>
 </html>

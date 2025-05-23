@@ -268,10 +268,10 @@
     </tr>
   <% } else { %>
     <% reg.forEach(regs => { 
-         const matchedGp = gp.find(res => res.Session === regs.Session);
+         const matchedGp = gp.find(res => res.Session == regs.session_year);
     %>
       <tr>
-        <td><%= regs.Session %> / <%= regs.Session + 1 %></td>
+        <td><%= regs.session_year %> / <%= Number(regs.session_year) + 1 %></td>
         <td>
           <% if (matchedGp) { %>
             <%= matchedGp.mygp.toFixed(2) %>
@@ -282,7 +282,7 @@
         <td>
           <% if (matchedGp) { %>
             <button class="resultbtn">
-              <a href="/view_result?id=<%= matric %>&session=<%= regs.Session %>&gp=<%= matchedGp.mygp.toFixed(2) %>">View Result</a>
+             <a href="/view_result?id=<%= matric %>&session=<%= regs.session_year %>&gp=<%= matchedGp.mygp.toFixed(2) %>">View Result</a>
             </button>
           <% } %>
         </td>
@@ -298,8 +298,18 @@
        <div>&copy; <%= new Date().getFullYear() %> FCAHPTIB.</div>
   <div>Designed by Adeola Quadri. A</div>
   <div>Supervised Dr. Mrs Olarenwaju O T.</div>
-      </footer>
-       <script> 
-       const menuToggle = document.getElementById('menuToggle'); const sidebar = document.getElementById('sidebar'); menuToggle.addEventListener('click', () => { sidebar.classList.toggle('show'); });
+  </footer>
+
+  <script> 
+  const menuToggle = document.getElementById('menuToggle'); const sidebar = document.getElementById('sidebar'); menuToggle.addEventListener('click', () => { sidebar.classList.toggle('show'); });
+  document.querySelectorAll('.sidebar a').forEach(link => {
+  link.addEventListener('click', () => {
+    if (window.innerWidth <= 768) {
+      sidebar.classList.remove('show');
+    }
+  });
+});
+
  </script> 
- </body> </html>
+ </body>
+  </html>
