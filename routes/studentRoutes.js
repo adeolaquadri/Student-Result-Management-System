@@ -309,6 +309,7 @@ router.post('/submit_registration', async(req, res) => {
     if (studentRows.length === 0) throw new Error('Student not found');
 
     const student = studentRows[0];
+    const department = student.Department;
     let current_level;
 
     if (academic[0].session == student.Admission_Year) {
@@ -325,10 +326,10 @@ router.post('/submit_registration', async(req, res) => {
   }
 
   // Insert each course into the DB
-  const values = selectedCourses.map(code => [matricNo, code, sessionYear, semester, current_level]);
+  const values = selectedCourses.map(code => [matricNo, code, sessionYear, semester, current_level, department]);
 
   const myquery = `
-    INSERT INTO course_registrations (matric_no, course_code, session_year, semester, level)
+    INSERT INTO course_registrations (matric_no, course_code, session_year, semester, level, department)
     VALUES ?
   `;
 
@@ -648,7 +649,8 @@ router.get('/Reprint_CourseForm', async (req, res) => {
     ON c.COURSE_ID = r.course_code
     WHERE r.matric_no = ?
     AND r.session_year = ?
-    AND r.semester = ?`
+    AND r.semester = ?
+    AND r.department = ?`
 
     const totalCourseUnit = `SELECT SUM(c.COURSE_UNIT) AS total
     FROM course_table c
@@ -656,17 +658,17 @@ router.get('/Reprint_CourseForm', async (req, res) => {
     WHERE r.matric_no = ?
     AND r.session_year = ?
     AND r.semester = ?
+    AND r.department = ?
 `
-
 
     // Fetch student data
     const [student] = await query('SELECT * FROM student WHERE MatricNo = ?', [verify.matric]);
 
     // Fetch registered courses
-    const courses = await query(courseQueryList, [verify.matric, session, semester]);
+    const courses = await query(courseQueryList, [verify.matric, session, semester, department]);
 
     // Fetch total course unit
-    const [totals] = await query(totalCourseUnit, [verify.matric, session, semester]);
+    const [totals] = await query(totalCourseUnit, [verify.matric, session, semester, department]);
     res.render('student/reprint_CF', {
       matric: verify.matric,
       department: verify.department,
