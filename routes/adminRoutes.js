@@ -158,10 +158,10 @@ router.get('/upload_result', (req, res)=>{
 
 //Post: Admin Upload Student Result
 router.post('/upload_result', upload.single('file'), async (req, res) => {
-  const filePath = path.join(__dirname, 'uploads', req.file.filename);
+   const filePath = path.join(__dirname, '../uploads', req.file.filename);
 
   try {
-    await uploadCsv(filePath, req.body);
+    await uploadResult(filePath, req.body);
     fs.unlinkSync(filePath); // Cleanup uploaded file
 
     const message = 'Result uploaded Successfully';
@@ -182,7 +182,7 @@ router.post('/upload_result', upload.single('file'), async (req, res) => {
   }
 });
 
-function uploadCsv(filePath, formData) {
+function uploadResult(filePath, formData) {
   return new Promise((resolve, reject) => {
     const csvData = [];
 

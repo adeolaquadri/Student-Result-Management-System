@@ -266,28 +266,29 @@
               <th scope="col">Course Title</th>
               <th scope="col">Credit Unit</th>
               <th scope="col" class="text-center">Select</th>
+              <th scope="col">Status</th>
             </tr>
           </thead>
           <tbody>
             <% if (courses && courses.length) { %>
-              <% courses.forEach((course, i) => { %>
-                <tr>
-                  <td><%= i + 1 %></td>
-                  <td><%= course.COURSE_ID %></td>
-                  <td><%= course.COURSE_TITLE %></td>
-                  <td><%= course.COURSE_UNIT %></td>
-                  <td class="text-center">
-                    <input 
-                      type="checkbox" 
-                      name="selectedCourses[]" 
-                      value="<%=course.COURSE_ID%>" 
-                      checked 
-                      aria-checked="true"
-                      <%=disabled%>
-                    />
-                  </td>
-                </tr>
-              <% }) %>
+              <% courses.forEach((course, index) => { %>
+  <tr>
+    <td><%= index + 1 %></td>
+    <td><%= course.COURSE_ID %></td>
+    <td><%= course.COURSE_TITLE %></td>
+    <td><%= course.COURSE_UNIT %></td>
+    <td>
+      <% if (!disabled) { %>
+        <input type="checkbox" name="selectedCourses[]" value="<%= course.COURSE_ID %>"
+        aria-checked="true" checked>
+      <% } else { %>
+        <input type="checkbox" checked disabled>
+      <% } %>
+    </td>
+    <td><%= course.is_repeat ? "Repeat" : "New" %></td>
+  </tr>
+<% }) %>
+
             <% } else { %>
               <tr>
                 <td colspan="5" class="text-center text-danger">

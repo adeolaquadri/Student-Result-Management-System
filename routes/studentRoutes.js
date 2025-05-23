@@ -252,22 +252,65 @@ router.get('/course_registration', async (req, res) => {
       current_level = 'FGS';
     }
 
-    // Fetch relevant data
-    const courses = await query(
-      'SELECT * FROM course_table WHERE SEMESTER = ? AND DEPARTMENT = ? AND LEVEL = ?',
-      [semester, department, current_level]
+   const [existingReg] = await query(
+      'SELECT * FROM course_registrations WHERE matric_no = ? AND semester = ? AND session_year = ? AND level = ? LIMIT 1',
+      [verify.matric, semester, session, current_level]
     );
+
+let courses;
+if (existingReg) {
+  // Student has already registered, fetch registered courses only
+  courses = await query(`
+    SELECT ct.*, cr.is_repeat
+    FROM course_registrations cr
+    JOIN course_table ct ON cr.course_code = ct.COURSE_ID
+    WHERE cr.matric_no = ?
+      AND cr.session_year = ?
+      AND cr.semester = ?
+      AND cr.level = ?
+  `, [verify.matric, session, semester, current_level]);
+
+} else {
+  // Student has not registered, fetch new + repeated courses
+  courses = await query(`
+    (
+      SELECT 
+        ct.*, 
+        FALSE AS is_repeat
+      FROM course_table ct
+      WHERE ct.SEMESTER = ? 
+        AND ct.DEPARTMENT = ? 
+        AND ct.LEVEL = ?
+    )
+    UNION
+    (
+      SELECT 
+        ct.*,
+        TRUE AS is_repeat 
+      FROM student_result sr
+      JOIN course_table ct 
+        ON sr.CourseId = ct.COURSE_ID 
+        AND sr.Semester = ct.SEMESTER
+      LEFT JOIN course_registrations cr
+        ON sr.MatricNo = cr.matric_no 
+        AND sr.CourseId = cr.course_code 
+        AND cr.session_year = ? 
+        AND sr.Semester = cr.semester
+      WHERE sr.MatricNo = ?
+        AND sr.GP = 0
+        AND sr.Session < ?
+        AND sr.Semester = ?
+        AND cr.course_code IS NULL
+    )
+  `, [semester, department, current_level, session, verify.matric, session, semester]);
+}
+
+console.log(courses);
 
     const [totalUnitRow] = await query(
       'SELECT SUM(COURSE_UNIT) AS total FROM course_table WHERE SEMESTER = ? AND DEPARTMENT = ? AND LEVEL = ?',
       [semester, department, current_level]
     );
-
-    const [existingReg] = await query(
-      'SELECT * FROM course_registrations WHERE matric_no = ? AND semester = ? AND session_year = ? AND level = ? LIMIT 1',
-      [verify.matric, semester, session, current_level]
-    );
-    console.log(existingReg)
 
     // Render response
     return res.render('student/course_reg', {
@@ -325,22 +368,41 @@ router.post('/submit_registration', async(req, res) => {
     return res.send('No courses selected.');
   }
 
-  // Insert each course into the DB
-  const values = selectedCourses.map(code => [matricNo, code, sessionYear, semester, current_level, department]);
+  // Fetch repeated courses for the student
+const repeatedCourses = await query(`
+  SELECT DISTINCT sr.CourseId
+  FROM student_result sr
+  WHERE sr.MatricNo = ?
+    AND sr.GP = 0
+    AND sr.Session < ?
+`, [matricNo, sessionYear]);
 
-  const myquery = `
-    INSERT INTO course_registrations (matric_no, course_code, session_year, semester, level, department)
-    VALUES ?
-  `;
+const repeatedCourseIds = repeatedCourses.map(row => row.CourseId);
 
-  dbConnection.query(myquery, [values], (err, results) => {
-    if (err) {
-      console.error('DB Error:', err);
-      return res.status(500).send('Database error occurred.');
-    }
+// Map selected courses with is_repeat status
+const values = selectedCourses.map(code => [
+  matricNo,
+  code,
+  sessionYear,
+  semester,
+  current_level,
+  department,
+  repeatedCourseIds.includes(code) // is_repeat flag (true/false)
+]);
 
-    res.send(`Successfully registered courses: ${selectedCourses.join(', ')}`);
-  });
+const insertQuery = `
+  INSERT INTO course_registrations 
+    (matric_no, course_code, session_year, semester, level, department, is_repeat)
+  VALUES ?
+`;
+
+dbConnection.query(insertQuery, [values], (err, results) => {
+  if (err) {
+    console.error('DB Error:', err);
+    return res.status(500).send('Database error occurred.');
+  }
+  return res.redirect('/course_registration');
+});
 });
 
 
@@ -389,9 +451,23 @@ router.get('/result', async (req, res) => {
     );
 
     // 6. Get GP per session
-    const sessionGPA = await query(
-      'SELECT Session, SUM(GP) / SUM(CourseUnit) AS mygp FROM student_result WHERE MatricNo = ? GROUP BY Session',
-      [token.matric]
+    const sessionGpaQuery = `
+    SELECT 
+    sr.Session, 
+    SUM(sr.GP) / SUM(sr.CourseUnit) AS mygp
+FROM 
+    student_result sr
+JOIN 
+    course_registrations cr 
+    ON sr.MatricNo = cr.matric_no 
+    AND sr.CourseId = cr.course_code 
+    AND sr.Session = cr.session_year
+WHERE 
+    sr.MatricNo = ?
+GROUP BY 
+    sr.Session
+`
+    const sessionGPA = await query(sessionGpaQuery, [token.matric]
     );
 
     // If no results found
@@ -439,6 +515,7 @@ router.get('/result', async (req, res) => {
     res.status(500).send('Internal server error');
   }
 });
+
 
 
 
@@ -584,20 +661,40 @@ router.get('/view_result', async (req, res) => {
       return res.status(400).send("Missing required query parameters.");
     }
 
-    const resultData = await query(
-      `SELECT * FROM student_result WHERE MatricNo = ? AND Session = ? ORDER BY CourseId`,
-      [id, session]
-    );
+    const resultQuery = `
+SELECT r.*, res.*
+FROM course_registrations r
+JOIN student_result res
+  ON r.matric_no = res.MatricNo
+  AND r.course_code = res.CourseId
+  AND r.session_year = res.Session
+WHERE r.matric_no = ?
+  AND r.session_year = ?
+  AND r.department = ?
+ORDER BY res.CourseId;
+`
+
+const cgpaQuery = `
+SELECT 
+    SUM(sr.GP) / SUM(sr.CourseUnit) AS cgpa
+FROM 
+    student_result sr
+JOIN 
+    course_registrations cr
+    ON sr.MatricNo = cr.matric_no
+    AND sr.CourseId = cr.course_code
+    AND sr.Session = cr.session_year
+WHERE 
+    sr.MatricNo = ?
+
+`
+
+    const resultData = await query(resultQuery, [id, session, verify.department]);
 
     const regSessions = await query(
-      `SELECT DISTINCT session_year FROM course_registrations WHERE matric_no = ?`,
-      [id]
-    );
+      `SELECT DISTINCT session_year FROM course_registrations WHERE matric_no = ?`, [id]);
 
-    const [cgpaRow] = await query(
-      `SELECT SUM(GP) / SUM(CourseUnit) AS cgpa FROM student_result WHERE MatricNo = ?`,
-      [verify.matric]
-    );
+    const [cgpaRow] = await query(cgpaQuery, [verify.matric]);
 
     const [adYearRow] = await query(
       `SELECT Admission_Year FROM student WHERE MatricNo = ?`,
@@ -618,7 +715,7 @@ router.get('/view_result', async (req, res) => {
       session: resultData[0]?.Session || '',
       semester: resultData[0]?.Semester || '',
       result: resultData,
-      gpa: gp,
+      gpa: tgp / tcu,
       tgp: tgp,
       tcu: tcu,
       cgpa: cgpaRow?.cgpa || 0,
@@ -647,14 +744,18 @@ router.get('/Reprint_CourseForm', async (req, res) => {
     FROM course_table c
     JOIN course_registrations r
     ON c.COURSE_ID = r.course_code
+    AND c.DEPARTMENT = r.department
     WHERE r.matric_no = ?
     AND r.session_year = ?
     AND r.semester = ?
-    AND r.department = ?`
+    AND r.department = ?;
+`
 
     const totalCourseUnit = `SELECT SUM(c.COURSE_UNIT) AS total
     FROM course_table c
-    JOIN course_registrations r ON c.COURSE_ID = r.course_code
+    JOIN course_registrations r 
+    ON c.COURSE_ID = r.course_code
+    AND c.DEPARTMENT = r.department
     WHERE r.matric_no = ?
     AND r.session_year = ?
     AND r.semester = ?

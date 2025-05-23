@@ -233,13 +233,13 @@
     <div class="summary" aria-label="Summary of grades">
       <div><strong>TGP:</strong> <%= tgp %></div>
       <div><strong>TCU:</strong> <%= tcu %></div>
-      <div><strong>GPA:</strong> <%= gpa %></div>
+      <div><strong>GPA:</strong> <%= gpa.toFixed(2) %></div>
       <div>
         <strong>CGPA:</strong> 
-        <% if(session == adYear + 1 && reg.length != 1){ %>
+        <% if(session == adYear + 1){ %>
           <%= cgpa.toFixed(2) %>
         <% } else { %>
-          <%= gpa %>
+          <%= gpa.toFixed(2) %>
         <% } %>
       </div>
     </div>

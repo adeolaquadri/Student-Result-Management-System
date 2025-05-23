@@ -103,7 +103,11 @@
         <tr>
           <td><%= index + 1 %></td>
           <td><%= res.COURSE_ID %></td>
-          <td style="text-transform: capitalize;"><%= res.COURSE_TITLE %></td>
+          <td style="text-transform: capitalize;"><%= res.COURSE_TITLE %>
+          <% if(res.is_repeat) {%>
+            <span><%= res.is_repeat ? 'Repeat' : '' %></span>
+            <%}%>
+        </td>
           <td><%= res.COURSE_UNIT %></td>
           <td>Registered</td>
         </tr>
