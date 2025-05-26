@@ -198,28 +198,42 @@ router.get('/change_password', async (req, res) => {
 
 //Put: Student change password
 router.put('/new_password', (req, res)=>{
+  if(!req.cookies.jwt) return res.status(401).json({success: false, message: "No authorizationtoken found!"})
     try{
+
     const {oldpassword, newpassword, confirmpassword} = req.body
-    if(req.cookies.jwt){
-       const identity = jwt.verify(req.cookies.jwt, process.env.secret_key)
-       const matric = identity.matric;
+    const identity = jwt.verify(req.cookies.jwt, process.env.secret_key)
+    const matric = identity.matric;
 
-    dbConnection.query('select * from student where MatricNo = ?', [matric], (err, result)=>{
-            if (err) res.status(500);
-            if(result.length === 1){
-            if(confirmpassword !== newpassword) return res.status(403).json();
-            if(oldpassword !== result[0].Passcode) return res.status(401).json();
+    dbConnection.query('SELECT Passcode FROM student WHERE MatricNo = ?', [matric], (err, student)=>{
+      if(err) res.status(500).json({success: false, message: "Database Error"})
+     const password = student[0].Passcode;
 
-        let updateQuery = 'UPDATE student SET Passcode = ? WHERE MatricNo = ?';
-    dbConnection.query(updateQuery, [newpassword, matric], (err, row)=>{
-        if(err) return res.status(500).json();
-        return res.status(200).json();
-    })
-        }
-    })
+     if(!oldpassword || !newpassword || !confirmpassword){
+      return res.status(400).json({success: false, message: "All fields are required!"})
     }
+
+    const validateOldPassword = bcrypt.compareSync(oldpassword, password);
+
+    if(!validateOldPassword){
+      return res.status(400).json({success: false, message: "Your current password is incorrect!"})
+    }
+
+    if(confirmpassword !== newpassword){ 
+      return res.status(400).json({success: false, message: "Passwords do not match"});
+    }
+    const updateQuery = 'UPDATE student SET Passcode = ? WHERE MatricNo = ?';
+    const hashNewPassword = bcrypt.hashSync(newpassword, 10);
+
+
+    dbConnection.query(updateQuery, [hashNewPassword, matric], (err, row)=>{
+        if(err) return res.status(500).json();
+        return res.status(200).json({success: true, message: "Password updated successfully"});
+    })
+  })
 }catch(e){
-    return res.status(500).send(e.message)
+    console.error(e)
+    return res.status(500).json({success: false, message: "Internal Server Error"})
 }
 });
 
@@ -264,11 +278,13 @@ if (existingReg) {
     SELECT ct.*, cr.is_repeat
     FROM course_registrations cr
     JOIN course_table ct ON cr.course_code = ct.COURSE_ID
+    AND cr.department = ct.DEPARTMENT
     WHERE cr.matric_no = ?
       AND cr.session_year = ?
       AND cr.semester = ?
       AND cr.level = ?
-  `, [verify.matric, session, semester, current_level]);
+      AND cr.department = ?
+  `, [verify.matric, session, semester, current_level, department]);
 
 } else {
   // Student has not registered, fetch new + repeated courses
@@ -291,6 +307,7 @@ if (existingReg) {
       JOIN course_table ct 
         ON sr.CourseId = ct.COURSE_ID 
         AND sr.Semester = ct.SEMESTER
+        AND ct.DEPARTMENT = ?
       LEFT JOIN course_registrations cr
         ON sr.MatricNo = cr.matric_no 
         AND sr.CourseId = cr.course_code 
@@ -302,10 +319,8 @@ if (existingReg) {
         AND sr.Semester = ?
         AND cr.course_code IS NULL
     )
-  `, [semester, department, current_level, session, verify.matric, session, semester]);
+  `, [semester, department, current_level, department, session, verify.matric, session, semester]);
 }
-
-console.log(courses);
 
     const [totalUnitRow] = await query(
       'SELECT SUM(COURSE_UNIT) AS total FROM course_table WHERE SEMESTER = ? AND DEPARTMENT = ? AND LEVEL = ?',
@@ -337,8 +352,10 @@ console.log(courses);
 // Handle form submission
 router.post('/submit_registration', async(req, res) => {
   if(!req.cookies.jwt) return res.redirect('/');
+
   const verify = jwt.verify(req.cookies.jwt, process.env.secret_key);
   const query = util.promisify(dbConnection.query).bind(dbConnection);
+
   const { selectedCourses } = req.body;
   console.log('Selected courses:', selectedCourses);
   const matricNo = verify.matric;
@@ -375,7 +392,8 @@ const repeatedCourses = await query(`
   WHERE sr.MatricNo = ?
     AND sr.GP = 0
     AND sr.Session < ?
-`, [matricNo, sessionYear]);
+    AND sr.Semester = ?
+`, [matricNo, sessionYear, semester]);
 
 const repeatedCourseIds = repeatedCourses.map(row => row.CourseId);
 
@@ -470,22 +488,22 @@ GROUP BY
     const sessionGPA = await query(sessionGpaQuery, [token.matric]
     );
 
-    // If no results found
-    if (sessionGPA.length === 0) {
-      return res.render('student/result.ejs', {
-        fullname: `${student.Lastname} ${student.Firstname} ${student.Middlename}`,
-        matric: token.matric,
-        department: token.department,
-        level: currentLevel,
-        message: 'No results found.',
-        style: 'color: red; font-weight: bold; text-align: center; margin-top: 20px;',
-        gp: [],
-        reg: registeredSessions,
-        myresult: [],
-        cgpa: null,
-        semester: ["First", "Second"],
-      });
-    }
+    // // If no results found
+    // if (sessionGPA.length === 0) {
+    //   return res.render('student/result.ejs', {
+    //     fullname: `${student.Lastname} ${student.Firstname} ${student.Middlename}`,
+    //     matric: token.matric,
+    //     department: token.department,
+    //     level: currentLevel,
+    //     message: 'No results found.',
+    //     style: 'color: red; font-weight: bold; text-align: center; margin-top: 20px;',
+    //     gp: [],
+    //     reg: registeredSessions,
+    //     myresult: [],
+    //     cgpa: null,
+    //     semester: ["First", "Second"],
+    //   });
+    // }
 
     // 7. Calculate CGPA
     const [cgpaRow] = await query(

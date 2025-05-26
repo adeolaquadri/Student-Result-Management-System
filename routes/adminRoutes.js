@@ -550,6 +550,7 @@ router.put('/update_result/:id', (req, res) => {
   }
   let {id} = req.params;
   let {session, semester, level, courseId, courseTitle, courseUnit, score, cp, gp } = req.body;
+  console.log(id, session, semester, level, courseId, courseTitle, courseUnit, score, cp, gp);
 
   // Basic validation
   if (!id || isNaN(id)) {

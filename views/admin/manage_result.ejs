@@ -184,9 +184,8 @@
     </thead>
     <tbody>
       <% result.forEach((res, index) => { %>
-        <tr>
+        <tr data-id="<%=res.id %>">
           <td contenteditable="false" data-column="id"><%= index + 1 %></td>
-           <input type="hidden" value="<%= res.id%>" id="data_id">
             <td contenteditable="false" data-column="matric"><%=res.MatricNo%></td>
             <td contenteditable="true" data-column="session"><%=res.Session%></td>
             <td contenteditable="true" data-column="semester"><%=res.Semester%></td>
@@ -263,8 +262,11 @@
     tableBody.addEventListener('click', (e) => {
       if (e.target.closest('.updatebtn')) {
         const row = e.target.closest('tr');
+        const id = row?.dataset?.id;
+        if(!id) return;
+
         const data = {
-          id: document.getElementById('data_id').value,
+          id: id,
           session: row.cells[2].innerText,
           semester: row.cells[3].innerText,
           level: row.cells[4].innerText,
@@ -281,7 +283,7 @@
       } else if (e.target.closest('.deletebtn')) {
         const row = e.target.closest('tr');
         const data = {
-          id: document.getElementById('data_id').value,
+          id: row?.dataset?.id,
         };
         if (confirm("Are you sure you want to delete this result?")) {
           deleteCourse(data);
