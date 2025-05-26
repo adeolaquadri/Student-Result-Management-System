@@ -169,13 +169,14 @@ router.get('/change_password', async (req, res) => {
       current_level = 'FGS';
     }
 
-    if (academic.session - admissionYear > 3) {
+    if ((academic.session - admissionYear) > 3) {
       return res.render('student/dashboard', {
-        fullname: verify.fullname,
+        fullname: `${student.Lastname} ${student.Firstname} ${student.Middlename}`,
         matric: verify.matric,
         department: verify.department,
         level: current_level,
-        session: academic,
+        session: academic.session,
+        semester: academic.semester,
         message: 'Your studentship is elapsed! Kindly visit the admin',
         alert: 'alert alert-danger'
       });
@@ -450,7 +451,7 @@ router.get('/result', async (req, res) => {
     // 4. Check if studentship has elapsed
     if (sessionDiff > 3) {
       return res.render('student/dashboard', {
-        fullname: token.fullname,
+        fullname: `${student.Lastname} ${student.Firstname} ${student.Middlename}`,
         matric: token.matric,
         department: token.department,
         level: currentLevel,
