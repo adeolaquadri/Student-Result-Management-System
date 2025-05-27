@@ -471,9 +471,9 @@ router.get('/result', async (req, res) => {
 
     // 6. Get GP per session
     const sessionGpaQuery = `
-    SELECT 
+   SELECT 
     sr.Session, 
-    SUM(sr.GP) / SUM(sr.CourseUnit) AS mygp
+    SUM(sr.GP) / SUM(ct.COURSE_UNIT) AS mygp
 FROM 
     student_result sr
 JOIN 
@@ -481,35 +481,33 @@ JOIN
     ON sr.MatricNo = cr.matric_no 
     AND sr.CourseId = cr.course_code 
     AND sr.Session = cr.session_year
+JOIN 
+    course_table ct 
+    ON sr.CourseId = ct.COURSE_ID 
+    AND cr.department = ct.DEPARTMENT
 WHERE 
     sr.MatricNo = ?
 GROUP BY 
-    sr.Session
+    sr.Session;
+
 `
     const sessionGPA = await query(sessionGpaQuery, [token.matric]
     );
 
-    // // If no results found
-    // if (sessionGPA.length === 0) {
-    //   return res.render('student/result.ejs', {
-    //     fullname: `${student.Lastname} ${student.Firstname} ${student.Middlename}`,
-    //     matric: token.matric,
-    //     department: token.department,
-    //     level: currentLevel,
-    //     message: 'No results found.',
-    //     style: 'color: red; font-weight: bold; text-align: center; margin-top: 20px;',
-    //     gp: [],
-    //     reg: registeredSessions,
-    //     myresult: [],
-    //     cgpa: null,
-    //     semester: ["First", "Second"],
-    //   });
-    // }
-
     // 7. Calculate CGPA
     const [cgpaRow] = await query(
-      'SELECT SUM(GP) / SUM(CourseUnit) AS cgpa FROM student_result WHERE MatricNo = ?',
-      [token.matric]
+      `SELECT 
+    SUM(sr.GP) / SUM(ct.COURSE_UNIT) AS cgpa
+FROM 
+    student_result sr
+JOIN 
+    course_table ct 
+    ON sr.CourseId = ct.COURSE_ID
+    AND ct.DEPARTMENT = ?
+WHERE 
+    sr.MatricNo = ?
+`,
+      [token.department, token.matric]
     );
 
     const cgpa = cgpaRow?.cgpa || null;
@@ -681,21 +679,25 @@ router.get('/view_result', async (req, res) => {
     }
 
     const resultQuery = `
-SELECT r.*, res.*
+SELECT r.*, res.*, ct.COURSE_TITLE, ct.COURSE_UNIT
 FROM course_registrations r
 JOIN student_result res
   ON r.matric_no = res.MatricNo
   AND r.course_code = res.CourseId
   AND r.session_year = res.Session
+LEFT JOIN course_table ct
+ON r.course_code = ct.COURSE_ID
 WHERE r.matric_no = ?
   AND r.session_year = ?
   AND r.department = ?
+  AND ct.DEPARTMENT = ?
 ORDER BY res.CourseId;
+
 `
 
 const cgpaQuery = `
 SELECT 
-    SUM(sr.GP) / SUM(sr.CourseUnit) AS cgpa
+    SUM(sr.GP) / SUM(ct.COURSE_UNIT) AS cgpa
 FROM 
     student_result sr
 JOIN 
@@ -703,17 +705,22 @@ JOIN
     ON sr.MatricNo = cr.matric_no
     AND sr.CourseId = cr.course_code
     AND sr.Session = cr.session_year
+LEFT JOIN
+    course_table ct
+    ON sr.CourseId = ct.COURSE_ID
+    AND sr.Department = ct.DEPARTMENT
 WHERE 
     sr.MatricNo = ?
 
 `
 
-    const resultData = await query(resultQuery, [id, session, verify.department]);
+    const resultData = await query(resultQuery, [id, session, verify.department, verify.department]);
 
     const regSessions = await query(
       `SELECT DISTINCT session_year FROM course_registrations WHERE matric_no = ?`, [id]);
 
     const [cgpaRow] = await query(cgpaQuery, [verify.matric]);
+    console.log(cgpaRow)
 
     const [adYearRow] = await query(
       `SELECT Admission_Year FROM student WHERE MatricNo = ?`,
@@ -723,7 +730,7 @@ WHERE
     let tgp = 0, tcu = 0;
     resultData.forEach(r => {
       tgp += r.GP;
-      tcu += r.CourseUnit;
+      tcu += r.COURSE_UNIT;
     });
 
     res.render('student/view_result', {

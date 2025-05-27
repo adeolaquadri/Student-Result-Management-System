@@ -182,6 +182,8 @@ router.post('/upload_result', upload.single('file'), async (req, res) => {
   }
 });
 
+
+
 function uploadResult(filePath, formData) {
   return new Promise((resolve, reject) => {
     const csvData = [];
@@ -190,51 +192,106 @@ function uploadResult(filePath, formData) {
       .pipe(csv.parse({ headers: false }))
       .on('error', reject)
       .on('data', (row) => csvData.push(row))
-      .on('end', () => {
-        if (csvData.length === 0) return reject(new Error('CSV file is empty'));
+      .on('end', async () => {
+        try {
+          if (csvData.length === 0) return reject(new Error('CSV file is empty'));
 
-        const dataRows = csvData.slice(1); // Remove header
+          const dataRows = csvData.slice(1); // Remove header
+          const processedRows = [];
 
-        // Process each row
-        for (let row of dataRows) {
-          const score = parseFloat(row[3]) || 0;
-          const unit = parseFloat(row[4]) || 0;
+          const connection = await new Promise((res, rej) => {
+            pool.getConnection((err, conn) => (err ? rej(err) : res(conn)));
+          });
 
-          // Add additional fields
-          row[7] = formData.session;
-          row[8] = formData.semester;
-          row[9] = formData.level;
+          for (let row of dataRows) {
+            if (row.length < 2) continue; // Skip malformed rows
 
-          // Calculate CP and GP
-          let cp = 0.00;
-          if (score >= 75 && score <= 100) cp = 4.00;
-          else if (score >= 70) cp = 3.50;
-          else if (score >= 65) cp = 3.25;
-          else if (score >= 60) cp = 3.00;
-          else if (score >= 55) cp = 2.75;
-          else if (score >= 50) cp = 2.50;
-          else if (score >= 45) cp = 2.25;
-          else if (score >= 40) cp = 2.00;
+            const matricNo = row[0];
+            const courseId = formData.coursecode;
+            const score = parseFloat(row[1]) || 0;
 
-          row[6] = cp.toFixed(2);               // CP
-          row[5] = (cp * unit).toFixed(2);      // GP = CP * Unit
-        }
+            // Fetch department from DB
+             const [resultDepartment] = await new Promise((res, rej) => {
+              connection.query(
+                'SELECT Department FROM student WHERE MatricNo = ?',
+                [matricNo],
+                (err, results) => (err ? rej(err) : res(results))
+              );
+            });
 
-        // Insert into database
-        pool.getConnection((err, connection) => {
-          if (err) return reject(err);
+             if (!resultDepartment || !resultDepartment.Department) {
+              console.warn(`Department not found for matricNo: ${matricNo}`);
+              continue; // Skip if student not found
+            }
 
-          const insertQuery = `INSERT INTO student_result 
-            (MatricNo, CourseId, CourseTitle, Score, CourseUnit, GP, CP, Session, Semester, Level) 
+            const department = resultDepartment.Department;
+
+            // Fetch course unit from DB
+            const [unitResult] = await new Promise((res, rej) => {
+              connection.query(
+                'SELECT COURSE_UNIT FROM course_table WHERE COURSE_ID = ? AND DEPARTMENT = ?',
+                [formData.coursecode, department],
+                (err, results) => (err ? rej(err) : res(results))
+              );
+            });
+
+
+           if (!unitResult || !unitResult.COURSE_UNIT) {
+              console.warn(`Course unit not found for courseId: ${courseId}`);
+              continue; // Skip if course not found
+            }
+
+           const unit = parseFloat(unitResult.COURSE_UNIT);
+
+            // Calculate CP
+            let cp = 0.00;
+            if (score >= 75 && score <= 100) cp = 4.00;
+            else if (score >= 70) cp = 3.50;
+            else if (score >= 65) cp = 3.25;
+            else if (score >= 60) cp = 3.00;
+            else if (score >= 55) cp = 2.75;
+            else if (score >= 50) cp = 2.50;
+            else if (score >= 45) cp = 2.25;
+            else if (score >= 40) cp = 2.00;
+
+            const gp = cp * unit;
+
+            // Final row structure
+            processedRows.push([
+              matricNo,
+              courseId,
+              score.toFixed(2),
+              gp.toFixed(2),
+              cp.toFixed(2),
+              formData.session,
+              formData.semester,
+              formData.level,
+              department
+            ]);
+          }
+          console.log(formData)
+          console.log(processedRows)
+
+          if (processedRows.length === 0) {
+            connection.release();
+            return reject(new Error('No valid data to insert.'));
+          }
+
+          const insertQuery = `
+            INSERT INTO student_result 
+            (MatricNo, CourseId, Score, GP, CP, Session, Semester, Level, Department)
             VALUES ?`;
 
-          connection.query(insertQuery, [dataRows], (error) => {
+          connection.query(insertQuery, [processedRows], (err) => {
             connection.release();
-            if (error) return reject(error);
+            if (err) return reject(err);
             console.log("Results uploaded successfully.");
-            resolve();
+            resolve({ inserted: processedRows.length });
           });
-        });
+
+        } catch (err) {
+          reject(err);
+        }
       });
   });
 }
@@ -403,20 +460,27 @@ router.put('/update_course/:id', (req, res) => {
     });
 });
 
-// router.get('/modify', (req, res)=>{
-//   const query = 'ALTER TABLE course_table MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT PRIMARY KEY;';
-//   // `ALTER TABLE course_table ADD COLUMN id INT NULL`
-// dbConnection.query(query, (err, success)=>{
-//   if(err) throw err;
-//   return res.status(200).json({success: success})
-// })
-// })
-
 //Get: Manage Student Result
 router.get('/manage_result', (req, res)=>{
     if(!req.cookies.admin) return res.redirect('/admin');
-        dbConnection.query('select * from student_result', (err, result)=>{
-        if(err) return res.status(500).send('Internal server error.');
+        dbConnection.query(
+          `SELECT 
+    sr.*, 
+    ct.COURSE_ID, 
+    ct.COURSE_TITLE,
+    ct.COURSE_UNIT
+FROM 
+    student_result sr
+JOIN 
+    course_table ct 
+    ON sr.CourseId = ct.COURSE_ID
+    AND sr.Department = ct.DEPARTMENT;
+
+          `, (err, result)=>{
+        if(err) {
+          console.error(err)
+          return res.status(500).send('Internal server error.');
+        }
         return res.render('admin/manage_result', {result:result})
         })
 })
