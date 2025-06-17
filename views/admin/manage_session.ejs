@@ -64,10 +64,33 @@
       text-align: center;
     }
 
-    .actions button {
-      margin: 0 5px;
-      padding: 5px 10px;
-    }
+    .btn {
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #fff;
+  font-size: 14px;
+}
+
+.btn-green {
+  background-color: #28a745;
+}
+
+.btn-red {
+  background-color: #dc3545;
+}
+
+.btn i {
+  pointer-events: none;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
   </style>
 </head>
 <body>
@@ -238,30 +261,48 @@
 
 
   <% if (records.length > 0) { %>
-    <table>
-      <thead>
-        <tr>
-          <th>Academic Session</th>
-          <th>Semester</th>
-          <th>Date Added</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% records.forEach(r => { %>
-          <tr>
-            <td><%= r.session %></td>
-            <td><%= r.semester %></td>
-            <td><%= new Date(r.createdAt).toDateString() %></td>
-            <td class="actions">
-              <form action="/admin/session/<%= r.id %>?_method=DELETE" method="POST" style="display:inline;">
-                <button type="submit">Delete</button>
-              </form>
-            </td>
-          </tr>
-        <% }) %>
-      </tbody>
-    </table>
+   <table>
+  <thead style="background-color: #7f2525; color: #fff;">
+    <tr>
+      <th>Academic Session</th>
+      <th>Semester</th>
+      <th>Date Added</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% records.forEach(r => { %>
+      <tr>
+        <td><%= r.session %></td>
+        <td><%= r.semester %></td>
+        <td><%= new Date(r.created_at).toDateString() %></td>
+        <td>
+          <% if (r.is_current) { %>
+            <span style="color: green; font-weight: bold;">Current</span>
+          <% } else { %>
+            <span style="color: gray;">Inactive</span>
+          <% } %>
+        </td>
+        <td class="actions">
+          <% if (!r.is_current) { %>
+            <form action="/admin/session/<%= r.id %>/set-current" method="POST" style="display:inline;">
+              <button type="submit" title="Mark as Current" class="btn btn-green">
+                <i class="fa fa-check-circle"></i>
+              </button>
+            </form>
+          <% } %>
+          <form action="/admin/session/<%= r.id %>?_method=DELETE" method="POST" style="display:inline;">
+            <button type="submit" onclick="return confirm('Delete this session?')" title="Delete" class="btn btn-red">
+              <i class="fa fa-trash"></i>
+            </button>
+          </form>
+        </td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
+
   <% } else { %>
     <p style="text-align:center;">No academic session added yet.</p>
   <% } %>

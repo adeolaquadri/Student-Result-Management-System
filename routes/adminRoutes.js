@@ -10,6 +10,8 @@ const router = express.Router();
 const util = require('util');
 const query = util.promisify(dbConnection.query).bind(dbConnection);
 const path = require('path');
+const PDFDocument = require('pdfkit');
+
 
 //CSV file upload storage
 let storage = multer.diskStorage({
@@ -76,7 +78,7 @@ router.post('/', async (req, res) => {
     }
 
     const admin = rows[0];
-    const isValidPassword = await bcrypt.compareSync(password, admin.password);
+    const isValidPassword = await bcrypt.compare(password, admin.password);
 
     if (!isValidPassword) {
       return renderAccessDenied(res);
@@ -90,10 +92,10 @@ router.post('/', async (req, res) => {
       sameSite: true,
     });
 
-    res.redirect('/admin/dashboard');
+   return res.redirect('/admin/dashboard');
   } catch (e) {
     console.error(e);
-    res.status(500).json({ error: e.message });
+    return res.status(500).send('An error occured.');
   }
 });
 
@@ -144,6 +146,7 @@ router.get('/dashboard', async (req, res) => {
     });
   } catch (err) {
     console.error(err);
+    return res.status(500).send('Internal server error');
   }
 });
 
@@ -158,6 +161,7 @@ router.get('/upload_result', (req, res)=>{
 
 //Post: Admin Upload Student Result
 router.post('/upload_result', upload.single('file'), async (req, res) => {
+  if(!req.cookies.admin) return res.send('Session is expired, please login.')
    const filePath = path.join(__dirname, '../uploads', req.file.filename);
 
   try {
@@ -307,7 +311,7 @@ router.get('/add_student', (req, res)=>{
 
 //POST: Upload student
 router.post('/upload_student', upload.single('file'), async (req, res) => {
-  if(!req.cookies.admin) return res.redirect('/admin')
+  if(!req.cookies.admin) return res.send('Session is expired, please login.')
   const filePath = path.join(__dirname, '../uploads', req.file.filename);
 
 
@@ -715,6 +719,7 @@ router.get('/reset-password', (req, res)=>{
 
 //PUT: Admin reset password
 router.put('/reset-password', async (req, res) => {
+  if(!req.cookies.admin) return res.send('Session is expired, please login.')
   try {
     const { resetToken, newpassword, confirmpassword, username } = req.body;
 
@@ -771,7 +776,7 @@ router.put('/reset-password', async (req, res) => {
 
 //Post: Admin upload Courses
 router.post('/upload_courses', upload.single('file'), (req, res) => {
-  if (!req.cookies.admin) return res.redirect('/admin');
+  if(!req.cookies.admin) return res.send('Session is expired, please login.');
 
   const filePath = path.join(__dirname, '../uploads', req.file.filename);
 
@@ -851,56 +856,14 @@ function uploadCoursesCsv(filePath) {
 }
 
 
-
-
-//GET: Admin generate student report
-router.get('/student-report/', async (req, res) => {
-    try {
-        // const { studentId, semester } = req.params;
-        const query1 = `SELECT MatricNo, Lastname, Firstname, Middlename, Department, Email FROM student WHERE 
-        MatricNo = 'HNDCOM/23/068'`
-        dbConnection.query(query1, (err, std)=>{
-            if(err) throw err
-        dbConnection.query(`SELECT CourseId, Score FROM student_result WHERE MatricNo = 'HNDCOM/23/068'`,
-            (err, result)=>{
-            if(err) throw err 
-        dbConnection.query(`select sum(GP) / sum(CourseUnit) as cgpa from student_result where MatricNo = 'HNDCOM/23/068'`,(err, CGPA)=>{
-        res.json({student: std, results:result, cgpa: CGPA[0].cgpa.toFixed(2)});
-            });
-        });
-        });
-    } catch (error) {
-        res.status(500).json({ error: "Error generating report" });
-    }
-});
-
-router.get('/academic', (req, res)=>{
-  let query = "DELETE FROM admin_table WHERE username = 'myadmin';";
-  let query1 = `CREATE TABLE academic_sessions (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  session VARCHAR(20) NOT NULL,
-  semester ENUM('First', 'Second') NOT NULL,
-  is_current BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE(session, semester)
-);
-`
-
-  dbConnection.query(query, (err, success)=>{
-    if(err)throw err;
-    return res.status(201).json({message: success})
-  })
-})
-
 //GET: Academic session
 router.get('/manage_session', async (req, res) => {
+  if(!req.cookies.admin) return res.redirect('/admin')
   try {
     dbConnection.query('SELECT * FROM academic_sessions ORDER BY created_at DESC', (err, rows)=>{
       if(err)throw err;
       res.render('admin/manage_session', { records: rows });
     })
-    // const [rows] = await query('SELECT * FROM academic_sessions ORDER BY created_at DESC');
-    // res.render('admin/manage_session', { records: rows });
   } catch (err) {
     console.error(err);
     res.send('Error fetching sessions');
@@ -909,6 +872,7 @@ router.get('/manage_session', async (req, res) => {
 
 // POST new session (and optionally mark as current)
 router.post('/add-session', async (req, res) => {
+  if(!req.cookies.admin) return res.send('Session is expired, please login.')
   const { session, semester, is_current } = req.body;
   try {
     if (is_current) {
@@ -929,6 +893,7 @@ router.post('/add-session', async (req, res) => {
 });
 
 router.delete('/session/:id', async(req, res)=>{
+  if(!req.cookies.admin) return res.send('Session is expired, please login.')
   try{
     await query('DELETE FROM academic_sessions WHERE id = ?', [req.params.id]);
     res.redirect('/admin/manage_session');
@@ -939,4 +904,149 @@ router.delete('/session/:id', async(req, res)=>{
   }
 })
 
+// POST: Mark a session as current
+router.post('/session/:id/set-current', async (req, res) => {
+  if(!req.cookies.admin) return res.send('Session is expired, please login.')
+  const { id } = req.params;
+  try {
+    // Unmark all others
+    await query('UPDATE academic_sessions SET is_current = FALSE');
+    // Set selected session as current
+    await query('UPDATE academic_sessions SET is_current = TRUE WHERE id = ?', [id]);
+
+    res.redirect('/admin/manage_session');
+  } catch (err) {
+    console.error(err);
+    res.send('Failed to set current session.');
+  }
+});
+
+
+//GET: Generate Reports
+router.get('/reports', async (req, res) => {
+  if(!req.cookies.admin) return res.redirect('/admin')
+    const { department, session, semester, matricNo } = req.query;
+
+  const conditions = [];
+  const params = [];
+
+  if (department) {
+    conditions.push("sr.Department = ?");
+    params.push(department);
+  }
+  if (session) {
+    conditions.push("sr.Session = ?");
+    params.push(session);
+  }
+  if (semester) {
+    conditions.push("sr.Semester = ?");
+    params.push(semester);
+  }
+  if (matricNo) {
+    conditions.push("sr.MatricNo = ?");
+    params.push(matricNo);
+  }
+
+  const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+
+  const reportQuery = `
+  SELECT sr.*, ct.COURSE_TITLE, ct.COURSE_UNIT, sr.Department
+  FROM student_result sr
+  JOIN course_table ct 
+    ON sr.CourseId = ct.COURSE_ID AND LOWER(sr.Department) = LOWER(ct.DEPARTMENT)
+  ${whereClause}
+  ORDER BY sr.Department, sr.MatricNo, sr.Session
+`;
+
+
+  const filterOptionsQuery = `
+    SELECT DISTINCT Department, Session, Semester, MatricNo FROM student_result`;
+
+  pool.query(reportQuery, params, (err, results) => {
+    if (err) return res.status(500).send(err.message);
+
+    pool.query(filterOptionsQuery, (fErr, filters) => {
+    if (fErr) return res.status(500).send(fErr.message);
+
+const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+const clean = (val) => typeof val === 'string' ? val.trim() : String(val || '').trim();
+const unique = (arr) => [...new Set(arr.filter(Boolean).map(clean))];
+
+res.render('admin/reports-all', {
+  results,
+ filters: {
+  departments: unique(filters.map(f => capitalize(f.Department))),
+  sessions: unique(filters.map(f => f.Session)),
+  semesters: unique(filters.map(f => f.Semester))
+},
+  selected: { department, session, semester, matricNo }
+});
+    });
+  });
+});
+
+//GET: Export reports to pdf route
+router.get('/reports/pdf', async (req, res) => {
+  try {
+    const results = await query(`
+      SELECT 
+        sr.MatricNo,
+        sr.Session,
+        sr.Semester,
+        sr.Level,
+        sr.CourseId,
+        ct.COURSE_TITLE,
+        ct.COURSE_UNIT,
+        sr.Score,
+        sr.CP,
+        sr.GP
+      FROM 
+        student_result sr
+      JOIN 
+        course_table ct 
+        ON sr.CourseId = ct.COURSE_ID AND sr.Department = ct.DEPARTMENT
+      ORDER BY sr.MatricNo, sr.Session, sr.Semester, ct.COURSE_TITLE
+    `);
+
+    const doc = new PDFDocument();
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'inline; filename="academic_reports.pdf"');
+    doc.pipe(res);
+
+    let currentMatric = null;
+    let totalGP = 0, totalUnit = 0;
+
+    results.forEach(r => {
+      if (r.MatricNo !== currentMatric) {
+        if (currentMatric !== null) {
+          const cgpa = totalUnit ? (totalGP / totalUnit).toFixed(2) : '0.00';
+          doc.text(`Total GP: ${totalGP.toFixed(2)} | Total Units: ${totalUnit} | CGPA: ${cgpa}`);
+          doc.moveDown();
+        }
+        currentMatric = r.MatricNo;
+        totalGP = 0;
+        totalUnit = 0;
+
+        doc.addPage().fontSize(14).text(`Matric No: ${r.MatricNo}`);
+        doc.fontSize(12).text(`Session: ${r.Session} | Semester: ${r.Semester} | Level: ${r.Level}`);
+        doc.moveDown().text('Courses:', { underline: true });
+      }
+
+      totalGP += parseFloat(r.GP);
+      totalUnit += parseFloat(r.COURSE_UNIT);
+
+      doc.text(` - ${r.CourseId} (${r.COURSE_TITLE}): Score ${r.Score}, Unit ${r.COURSE_UNIT}, CP ${r.CP}, GP ${r.GP}`);
+    });
+
+    if (results.length > 0) {
+      const cgpa = totalUnit ? (totalGP / totalUnit).toFixed(2) : '0.00';
+      doc.moveDown().text(`Total GP: ${totalGP.toFixed(2)} | Total Units: ${totalUnit} | CGPA: ${cgpa}`);
+    }
+
+    doc.end();
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error generating PDF');
+  }
+});
 module.exports = router;

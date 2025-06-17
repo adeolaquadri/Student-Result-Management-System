@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Academic Reports - Admin Panel</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0 30px;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+
+    h1 {
+      text-align: center;
+      margin-top: 30px;
+      color: #7f2525;
+    }
+
+    .pdf-button {
+      display: inline-block;
+      margin: 10px 0 20px auto;
+      background-color: #218838;
+      color: white;
+      padding: 8px 16px;
+      font-size: 14px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .pdf-button:hover {
+      background-color: #1e7e34;
+    }
+
+    form {
+      margin: 20px 0;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    form input, form select, form button {
+      padding: 8px;
+      font-size: 14px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+
+    form button {
+      background-color: #7f2525;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    .student-section {
+      background-color: white;
+      margin: 30px 0;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      page-break-inside: avoid;
+    }
+
+    .student-header {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 2px solid #ddd;
+      margin-bottom: 10px;
+      padding-bottom: 5px;
+      font-weight: bold;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 15px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #f0f0f0;
+    }
+
+    .cgpa-box {
+      background-color: #fff4ec;
+      padding: 10px;
+      margin-top: 10px;
+      border-left: 5px solid #ffa726;
+      font-weight: bold;
+    }
+
+    @media print {
+      .filter-form, .pdf-button {
+        display: none !important;
+      }
+      body {
+        background: white;
+        padding: 0;
+        color: #000;
+      }
+      .student-section {
+        box-shadow: none;
+        page-break-inside: avoid;
+      }
+      h2 {
+        color: black !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<h1>Students' Academic Report</h1>
+
+<button class="pdf-button" onclick="window.print()">Download PDF</button>
+
+<form method="GET" action="/admin/reports" class="filter-form">
+  <select name="department">
+    <option value="">All Departments</option>
+    <% filters.departments.forEach(dept => { %>
+      <option value="<%= dept %>" <%= selected.department === dept ? 'selected' : '' %>><%= dept %></option>
+    <% }) %>
+  </select>
+
+  <select name="session">
+    <option value="">All Sessions</option>
+    <% filters.sessions.forEach(sess => { %>
+      <option value="<%= sess %>" <%= selected.session === sess ? 'selected' : '' %>><%= sess %></option>
+    <% }) %>
+  </select>
+
+  <select name="semester">
+    <option value="">All Semesters</option>
+    <% filters.semesters.forEach(sem => { %>
+      <option value="<%= sem %>" <%= selected.semester === sem ? 'selected' : '' %>><%= sem %></option>
+    <% }) %>
+  </select>
+
+  <input 
+    type="text" 
+    name="matricNo" 
+    placeholder="Enter Matric Number"
+    value="<%= selected.matricNo || '' %>" />
+
+  <button type="submit">Apply Filters</button>
+</form>
+
+<%
+  let currentDept = null;
+  let currentMatric = null;
+  let studentRows = [];
+
+  const renderStudent = () => {
+    if (!studentRows.length) return;
+    const totalGP = studentRows.reduce((sum, row) => sum + parseFloat(row.GP), 0);
+    const totalUnit = studentRows.reduce((sum, row) => sum + parseFloat(row.COURSE_UNIT), 0);
+    const cgpa = totalUnit ? (totalGP / totalUnit).toFixed(2) : '0.00';
+%>
+  <div class="student-section">
+    <div class="student-header">
+      <div>Matric No: <%= currentMatric %></div>
+      <div>Session: <%= studentRows[0].Session %> | Semester: <%= studentRows[0].Semester %> | Level: <%= studentRows[0].Level %></div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Course ID</th>
+          <th>Course Title</th>
+          <th>Unit</th>
+          <th>Score</th>
+          <th>CP</th>
+          <th>GP</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% studentRows.forEach(row => { %>
+          <tr>
+            <td><%= row.CourseId %></td>
+            <td><%= row.COURSE_TITLE %></td>
+            <td><%= row.COURSE_UNIT %></td>
+            <td><%= row.Score %></td>
+            <td><%= row.CP %></td>
+            <td><%= row.GP %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+    <div class="cgpa-box">
+      Total GP: <%= totalGP.toFixed(2) %> |
+      Total Units: <%= totalUnit %> |
+      CGPA: <strong><%= cgpa %></strong>
+    </div>
+  </div>
+<% studentRows = []; }; %>
+
+<% results.forEach((row, idx) => {
+  const isNewDept = row.Department !== currentDept;
+  const isNewStudent = row.MatricNo !== currentMatric;
+  const isLast = idx === results.length - 1;
+
+  if (isNewDept) {
+    if (currentDept !== null) renderStudent();
+%>
+    <h2 style="margin-top: 40px; color: #7f2525;"><%= row.Department %> Department</h2>
+<%
+    currentDept = row.Department;
+    currentMatric = null;
+  }
+
+  if (isNewStudent) {
+    if (studentRows.length) renderStudent();
+    currentMatric = row.MatricNo;
+  }
+
+  studentRows.push(row);
+
+  if (isLast) renderStudent();
+}); %>
+
+</body>
+</html>

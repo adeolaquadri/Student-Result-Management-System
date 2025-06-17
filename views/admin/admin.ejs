@@ -141,6 +141,25 @@
 </div>
 
 <a href="/admin/change_password" tabindex="0">Change Password</a>
+
+<button
+  id="generateReportBtn"
+  class="dropbtn"
+  aria-label="Generate Report"
+  onclick="window.location.href = '/admin/reports'"
+  style="
+    margin-left: auto;
+    background: #a73232;
+    border: none;
+    font-weight: 700;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+  ">
+  <i class="fa fa-file-alt" style="margin-right: 6px;"></i> Generate Report
+</button>
+
 <button
   id="logout-btn"
   class="dropbtn"
@@ -204,20 +223,6 @@
     <p>Courses</p>
     <i class="fa fa-book" aria-hidden="true"></i>
     <p id="descCourses" hidden>Manage courses offered</p>
-  </article>
-
-  <article
-    class="dash"
-    tabindex="0"
-    aria-describedby="descSemester"
-    role="button"
-    onclick="location.href='/admin/manage_semester'"
-    onkeypress="if(event.key==='Enter' || event.key===' ') location.href='/admin/manage_semester';"
-  >
-    <p><%= academic_semester.length %></p>
-    <p>Semesters</p>
-    <i class="fa fa-calendar" aria-hidden="true"></i>
-    <p id="descSemester" hidden>Manage academic semesters</p>
   </article>
 
   <article
